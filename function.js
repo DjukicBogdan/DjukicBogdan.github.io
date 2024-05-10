@@ -16,12 +16,12 @@ window.function = async function (text) {
             return "Invalid JSON data format: Missing player information.";
         }
 
-        const logString = getValidMatches(json); // Dobijanje logString-a umesto matches
+       
         // Provera da li ima pronađenih mečeva
         //if (logString.length === 0) {
            // return "No valid matches found.";
         //}
-        return logString;
+       // return logString;
         //const prioritizedMatches = prioritizeMatches(logString);
 
         //return prioritizedMatches;
@@ -29,7 +29,8 @@ window.function = async function (text) {
         return "Error while processing data: " + error;
     }
 
-
+ const logString = getValidMatches(json); // Dobijanje logString-a umesto matches
+    return await logString;
    // let result = await handleData(json);
     //let senddata = await result.toString();
     //return senddata;
