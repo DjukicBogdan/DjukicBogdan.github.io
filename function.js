@@ -1,9 +1,6 @@
 
   window.function = function (text) {
-    let json JSON.parse(text);
-    let json1 = handleData(json);
-    let json2 = JSON.stringify(json1);
-    return json2.toString();
+    return text;
   }
 
 async function handleData(json) {
