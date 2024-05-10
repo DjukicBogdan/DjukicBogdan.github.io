@@ -30,23 +30,24 @@ window.function = async function (text) {
     }
 
  const logString = await getValidMatches(json); // Dobijanje logString-a umesto matches
-    return logString.toString();
+  logString += " kraj string";
+    return await logString.toString();
    // let result = await handleData(json);
     //let senddata = await result.toString();
     //return senddata;
 }
 
 async function handleData(json) {
-    try {
-        if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
-            return "Invalid JSON data format: Missing player information.";
-        }
-        const logString = getValidMatches(json); // Dobijanje logString-a umesto matches
-        const prioritizedMatches = prioritizeMatches(logString.matches, json.PRIORITETI, json);
-        return prioritizedMatches;
-    } catch (error) {
-        return "Error while processing data:" + error;
-    }
+   // try {
+     //   if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
+     //       return "Invalid JSON data format: Missing player information.";
+     //   }
+      //  const logString = getValidMatches(json); // Dobijanje logString-a umesto matches
+      //  const prioritizedMatches = prioritizeMatches(logString.matches, json.PRIORITETI, json);
+      //  return prioritizedMatches;
+   // } catch (error) {
+  //      return "Error while processing data:" + error;
+  //  }
 }
 
 function getValidMatches(data) {
