@@ -2,7 +2,7 @@
   window.function = function (text) {
   let json = JSON.parse(text.value);
   let result = handleData(json);
-  let senddata = JSON.stringify(result);
+  let senddata = result.toString();
   return senddata;
   }
 
