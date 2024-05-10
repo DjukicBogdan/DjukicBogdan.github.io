@@ -1,6 +1,6 @@
 
   window.function = function (text) {
-    return text.data.IGRACI;
+    return handleData(json.data);
   }
 
 async function handleData(json) {
