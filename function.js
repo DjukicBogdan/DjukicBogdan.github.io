@@ -2,7 +2,7 @@
   window.function = function (text) {
     let json = {"name":"John", "age":30, "car":"somecar"};
     
-    return JSON.stringify(json);
+    return "JSON.stringify(json)";
   }
 
 async function handleData(json) {
