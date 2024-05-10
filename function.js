@@ -12,7 +12,7 @@ window.function = async function (text) {
   }
 
   let result = await handleData(json);
-  let senddata = await result.toString();
+  let senddata = await JSON.stringify(result);
   //senddata = senddata.replace(/[\])}[{(]/g, '');
   return await senddata.toString();
 };
