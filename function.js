@@ -9,18 +9,10 @@ async function handleData(json) {
       throw new Error("Invalid JSON data format: Missing player information.");
     }
 
-    console.log("JSON:", json);
-
     const matches = getValidMatches(json);
-    console.log("Matches:", matches);
-    console.log("Number of matches:", matches.length);
-
     const prioritizedMatches = prioritizeMatches(matches, json.PRIORITETI, json);
     console.log("Prioritized Matches:", prioritizedMatches);
     return prioritizedMatches;
-    // Uncomment to send the result back to the Glide application
-    // const response = await sendData('https://liga.bogdandjukic.com/', { matches: prioritizedMatches });
-    // console.log('Result successfully sent:', response);
   } catch (error) {
     console.error("Error while processing data:", error);
   }
@@ -144,22 +136,4 @@ function prioritizeMatches(matches, priorities, data) {
   }
 
   return Array.from(prioritizedMatches); // Convert the Set back to an array before returning
-}
-
-
-async function sendData(url = "https://liga.bogdandjukic.com/", data = {}) {
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-  // const responseData = await response.json();
-
-  // Checking response after sending
-  if (!response.ok) {
-    throw new Error(`HTTP error: ${response.status} - ${responseData.message}`);
-  }
-  return responseData;
 }
