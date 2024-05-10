@@ -6,10 +6,10 @@
     {
       "name": "text",
       "displayName": "Text",
-      "type": "json"
+      "type": "string"
     }
   ],
   "result": {
-    "type": "json"
+    "type": "string"
   }
 }
