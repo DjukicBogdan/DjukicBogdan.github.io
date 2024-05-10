@@ -30,7 +30,7 @@ window.function = async function (text) {
     }
 
  const logString = await getValidMatches(json); // Dobijanje logString-a umesto matches
-    return "logString";
+    return logString.toString();
    // let result = await handleData(json);
     //let senddata = await result.toString();
     //return senddata;
@@ -58,30 +58,30 @@ function getValidMatches(data) {
     const matches = [];
     const clubAvailableSlots = data.TERMINI_KLUBA;
 
-    let logString = ""; // Dodato polje za čuvanje logova
+    let logString = "Pocetak provere igraca."; // Dodato polje za čuvanje logova
 
     players.forEach((player) => {
         if (parseInt(player.ZELI_IGRATI_MECEVA) > 0) {
             const remainingMatches = parseInt(player.ZELI_IGRATI_MECEVA);
             let playedMatches = 0;
 
-            logString += `Checking player: ${player.PLAYER_NAME}\n`;
+            logString += `Checking player: ${player.PLAYER_NAME}`;
 
             player.TERMINI_IGRACA.forEach((slot) => {
-                logString += `  Checking player's slot: ${slot.dan} ${slot.sat}\n`;
+                logString += `  Checking player's slot: ${slot.dan} ${slot.sat}`;
 
                 const clubSlot = clubAvailableSlots.find((clubSlot) => clubSlot.dan === slot.dan && clubSlot.sat === slot.sat);
                 if (clubSlot && playedMatches < remainingMatches) {
                     logString += `    Found available club slot: ${slot.dan} ${slot.sat}\n`;
 
                     player.POTENCIJALNI_PROTIVNICI.forEach((opponent) => {
-                        logString += `      Checking opponent: ${opponent}\n`;
+                        logString += `      Checking opponent: ${opponent}`;
 
                         const opponentPlayer = players.find((p) => p.PLAYER_NAME === opponent);
                         if (opponentPlayer) {
                             const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
                             if (opponentSlot) {
-                                logString += `        Found match between ${player.PLAYER_NAME} and ${opponent}\n`;
+                                logString += `        Found match between ${player.PLAYER_NAME} and ${opponent}`;
                                 matches.push({
                                     player1: player.PLAYER_NAME,
                                     player2: opponent,
@@ -99,7 +99,7 @@ function getValidMatches(data) {
     logString += "Finished checking matches.";
 
     // Dodavanje matches u logString kao deo povratne vrednosti
-    return  logString;
+    return logString;
 }
 
 function prioritizeMatches(matches, priorities, data) {
