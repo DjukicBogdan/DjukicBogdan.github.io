@@ -73,13 +73,13 @@ function getValidMatches(data) {
 
 function prioritizeMatches(matches, priorities, data) {
   const prioritizedMatches = new Set(); // Use a Set to store unique matches
-
   for (const priority of priorities) {
     switch (priority.id) {
       case "10":
         // Ensure each player plays at least one match
         matches.forEach((match) => {
-          if (!prioritizedMatches.has(match)) { // Use has() to check if a match exists in the Set
+          if (!prioritizedMatches.has(match)) {
+            // Use has() to check if a match exists in the Set
             prioritizedMatches.add(match); // Add match to the Set
           }
         });
@@ -108,7 +108,6 @@ function prioritizeMatches(matches, priorities, data) {
             return isMorningB ? -1 : 1;
           }
         });
-
         matches.forEach((match) => prioritizedMatches.add(match)); // Add matches to the Set
         break;
       case "40":
@@ -139,7 +138,6 @@ function prioritizeMatches(matches, priorities, data) {
           const slotsCountB = playerSlotsCounts[b.player1] + playerSlotsCounts[b.player2];
           return slotsCountB - slotsCountA; // Sort in descending order of slot counts
         });
-
         matches.forEach((match) => prioritizedMatches.add(match)); // Add matches to the Set
         break;
 
@@ -149,5 +147,8 @@ function prioritizeMatches(matches, priorities, data) {
     }
   }
 
+  // if (prioritizedMatches.size == 0) {
+  //   return "no prioritizedMatches";
+  // }
   return Array.from(prioritizedMatches); // Convert the Set back to an array before returning
 }
