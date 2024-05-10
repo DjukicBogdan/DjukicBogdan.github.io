@@ -21,10 +21,10 @@ window.function = async function (text) {
         //if (logString.length === 0) {
            // return "No valid matches found.";
         //}
+        return logString.logString;
+        //const prioritizedMatches = prioritizeMatches(logString);
 
-        const prioritizedMatches = prioritizeMatches(logString.logString);
-
-        return prioritizedMatches;
+        //return prioritizedMatches;
     } catch (error) {
         return "Error while processing data: " + error;
     }
