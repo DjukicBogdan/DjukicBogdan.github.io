@@ -1,6 +1,6 @@
 
   window.function = function (text) {
-    return "handleData(text)";
+    return handleData(text);
   }
 
 async function handleData(json) {
@@ -17,7 +17,7 @@ async function handleData(json) {
 
     const prioritizedMatches = prioritizeMatches(matches, json.PRIORITETI, json);
     console.log("Prioritized Matches:", prioritizedMatches);
-    return JSON.stringify(prioritizedMatches);
+    return prioritizedMatches;
     // Uncomment to send the result back to the Glide application
     // const response = await sendData('https://liga.bogdandjukic.com/', { matches: prioritizedMatches });
     // console.log('Result successfully sent:', response);
