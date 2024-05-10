@@ -9,7 +9,7 @@
 async function handleData(json) {
   try {
     if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
-      throw new Error("Invalid JSON data format: Missing player information.");
+     return "Invalid JSON data format: Missing player information.";
     }
 
     const matches = getValidMatches(json);
@@ -17,13 +17,13 @@ async function handleData(json) {
     console.log("Prioritized Matches:", prioritizedMatches);
     return prioritizedMatches;
   } catch (error) {
-    console.error("Error while processing data:", error);
+    return "Error while processing data:"+ error;
   }
 }
 
 function getValidMatches(data) {
   if (!data || !data.IGRACI || !Array.isArray(data.IGRACI)) {
-    throw new Error("Invalid JSON data: Missing player information.");
+    return "Invalid JSON data: Missing player information.";
   }
 
   const players = data.IGRACI;
