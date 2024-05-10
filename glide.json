@@ -6,7 +6,7 @@
     {
       "name": "text",
       "displayName": "Text",
-      "type": "string"
+      "type": "json"
     }
   ],
   "result": {
