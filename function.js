@@ -1,7 +1,8 @@
 
   window.function = function (text) {
-    let json = handleData(json);
-    let json2 = JSON.stringify(json);
+    let json JSON.parse(text);
+    let json1 = handleData(json);
+    let json2 = JSON.stringify(json1);
     return json2.toString();
   }
 
