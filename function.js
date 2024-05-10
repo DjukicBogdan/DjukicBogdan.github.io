@@ -1,6 +1,6 @@
 
   window.function = function (text) {
-    let json = {"name":"John", "age":30, "car":"somecar"};
+    let json = handleData(json);
     let json2 = JSON.stringify(json);
     return json2.toString();
   }
