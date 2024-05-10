@@ -21,7 +21,7 @@
 
     // Provera da li ima pronađenih mečeva
     if (matches.length === 0) {
-      return "No valid matches found.";
+      return "No valid matches found..";
     }
 
     const prioritizedMatches = prioritizeMatches(matches, json.PRIORITETI, json);
