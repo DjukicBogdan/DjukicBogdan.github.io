@@ -1,8 +1,8 @@
 
   window.function = function (text) {
-  let json JSON.parse(text.value);
- 
-  let senddata = JSON.stringify(json);
+  let json = JSON.parse(text.value);
+  let result = handleData(json);
+  let senddata = JSON.stringify(result);
   return senddata;
   }
 
