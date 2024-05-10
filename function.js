@@ -55,8 +55,8 @@ function getValidMatches(data) {
                 const teren = matches.find((match) => match.courtID === clubSlot.teren);
                 if (!teren) {
                   matches.push({
-                    player1: player.PLAYER_ID,
-                    player2: opponent,
+                    player1ID: player.PLAYER_ID,
+                    player2ID: opponent,
                     dayPlayed: slot.dan,
                     hourPlayed: slot.sat,
                     courtID: clubSlot.teren,
@@ -74,7 +74,6 @@ function getValidMatches(data) {
 
   return matches;
 }
-
 function prioritizeMatches(matches, priorities, data) {
   const prioritizedMatches = new Set(); // Use a Set to store unique matches
   for (const priority of priorities) {
@@ -117,8 +116,8 @@ function prioritizeMatches(matches, priorities, data) {
       case "40":
         // Prioritize players with the most remaining matches
         matches.sort((a, b) => {
-          const player1Matches = data.IGRACI.find((player) => player.PLAYER_ID === a.player1).PREOSTALO_MECEVA;
-          const player2Matches = data.IGRACI.find((player) => player.PLAYER_ID === b.player2).PREOSTALO_MECEVA;
+          const player1Matches = data.IGRACI.find((player) => player.PLAYER_ID === a.player1ID).PREOSTALO_MECEVA;
+          const player2Matches = data.IGRACI.find((player) => player.PLAYER_ID === b.player2ID).PREOSTALO_MECEVA;
           return player2Matches - player1Matches;
         });
 
@@ -131,15 +130,15 @@ function prioritizeMatches(matches, priorities, data) {
 
         matches.forEach((match) => {
           // Increment slot count for player 1
-          playerSlotsCounts[match.player1] = (playerSlotsCounts[match.player1] || 0) + 1;
+          playerSlotsCounts[match.player1ID] = (playerSlotsCounts[match.player1ID] || 0) + 1;
           // Increment slot count for player 2
-          playerSlotsCounts[match.player2] = (playerSlotsCounts[match.player2] || 0) + 1;
+          playerSlotsCounts[match.player2ID] = (playerSlotsCounts[match.player2ID] || 0) + 1;
         });
 
         // Sort players based on the number of slots they have signed up for
         matches.sort((a, b) => {
-          const slotsCountA = playerSlotsCounts[a.player1] + playerSlotsCounts[a.player2];
-          const slotsCountB = playerSlotsCounts[b.player1] + playerSlotsCounts[b.player2];
+          const slotsCountA = playerSlotsCounts[a.player1ID] + playerSlotsCounts[a.player2ID];
+          const slotsCountB = playerSlotsCounts[b.player1ID] + playerSlotsCounts[b.player2ID];
           return slotsCountB - slotsCountA; // Sort in descending order of slot counts
         });
         matches.forEach((match) => prioritizedMatches.add(match)); // Add matches to the Set
@@ -151,8 +150,5 @@ function prioritizeMatches(matches, priorities, data) {
     }
   }
 
-  // if (prioritizedMatches.size == 0) {
-  //   return "no prioritizedMatches";
-  // }
   return Array.from(prioritizedMatches); // Convert the Set back to an array before returning
 }
