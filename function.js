@@ -59,19 +59,30 @@ function getValidMatches(data) {
   const matches = [];
   const clubAvailableSlots = data.TERMINI_KLUBA;
 
+  let logString = "";
+
   players.forEach((player) => {
     if (parseInt(player.ZELI_IGRATI_MECEVA) > 0) {
       const remainingMatches = parseInt(player.ZELI_IGRATI_MECEVA);
       let playedMatches = 0;
 
+      logString += `Checking player: ${player.PLAYER_NAME}\n`;
+
       player.TERMINI_IGRACA.forEach((slot) => {
+        logString += `  Checking player's slot: ${slot.dan} ${slot.sat}\n`;
+
         const clubSlot = clubAvailableSlots.find((clubSlot) => clubSlot.dan === slot.dan && clubSlot.sat === slot.sat);
         if (clubSlot && playedMatches < remainingMatches) {
+          logString += `    Found available club slot: ${slot.dan} ${slot.sat}\n`;
+
           player.POTENCIJALNI_PROTIVNICI.forEach((opponent) => {
+            logString += `      Checking opponent: ${opponent}\n`;
+
             const opponentPlayer = players.find((p) => p.PLAYER_NAME === opponent);
             if (opponentPlayer) {
               const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
               if (opponentSlot) {
+                logString += `        Found match between ${player.PLAYER_NAME} and ${opponent}\n`;
                 matches.push({
                   player1: player.PLAYER_NAME,
                   player2: opponent,
@@ -86,8 +97,12 @@ function getValidMatches(data) {
     }
   });
 
-  return matches;
+  logString += "Finished checking matches.";
+  //console.log(logString); // Prikazuje log u konzoli za lakše praćenje
+
+  return logString;
 }
+
 
 function prioritizeMatches(matches, priorities, data) {
   const prioritizedMatches = new Set(); // Use a Set to store unique matches
