@@ -1,7 +1,7 @@
 {
   "name": "Text Length",
   "description": "Gives the length of a text in characters",
-  "author": "me",
+  "author": "DjukicBogdan",
   "params": [
     {
       "name": "text",
