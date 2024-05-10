@@ -1,5 +1,5 @@
 window.function = async function (text) {
-  let json = JSON.parse(text.value);
+  let json = JSON.parse(text.value.json());
 
   // Provera da li je JSON objekat validan
   if (!json || typeof json !== "object") {
@@ -24,7 +24,7 @@ async function handleData(json) {
     }
     const matches = await getValidMatches(json);
     const prioritizedMatches = await prioritizeMatches(matches, json.PRIORITETI, json);
-    return prioritizedMatches;
+    return await prioritizedMatches;
   } catch (error) {
     return "Error while processing data:" + error;
   }
