@@ -1,6 +1,6 @@
 
   window.function = function (text) {
-    return "text: " + text.data + text.data.key + text.data.params;
+    return "text: " + text.data;
   }
 
 async function handleData(json) {
