@@ -21,7 +21,7 @@ window.function = async function (text) {
         //if (logString.length === 0) {
            // return "No valid matches found.";
         //}
-       // return "logString";
+       // return logString;
         //const prioritizedMatches = prioritizeMatches(logString);
 
         //return prioritizedMatches;
@@ -30,7 +30,7 @@ window.function = async function (text) {
     }
 
  const logString = await getValidMatches(json); // Dobijanje logString-a umesto matches
-    return await logString;
+    return "logString";
    // let result = await handleData(json);
     //let senddata = await result.toString();
     //return senddata;
