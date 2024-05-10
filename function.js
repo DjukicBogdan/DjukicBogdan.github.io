@@ -1,9 +1,9 @@
 
-  window.function = function (text) {
+  window.function = async function (text) {
   let json = JSON.parse(text.value);
-  let result = handleData(json);
-  let senddata = JSON.stringify(result);
-  return senddata;
+  let result = await handleData(json);
+  let senddata = await JSON.stringify(result);
+  return await senddata;
   }
 
 async function handleData(json) {
