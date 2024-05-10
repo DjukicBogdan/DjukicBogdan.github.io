@@ -15,6 +15,7 @@
     
   let result = await handleData(json);
   let senddata = await JSON.stringify(result);
+  senddata = senddata.replace(/[^a-zA-Z0-9 ]/g, "");
   return await senddata;
   }
 
