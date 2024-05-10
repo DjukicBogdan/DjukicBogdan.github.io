@@ -1,10 +1,10 @@
 
-  window.function = function (text) {
-  let json = JSON.parse(text.value);
-  let result = handleData(json);
-  let senddata = result.toString();
-  return senddata;
-  }
+  window.function = async function (text) {
+    let json = JSON.parse(text.value);
+    let result = await handleData(json);
+    let senddata = await result.toString();
+    return senddata;
+    }
 
 async function handleData(json) {
   try {
