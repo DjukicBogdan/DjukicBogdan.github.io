@@ -64,24 +64,25 @@ function getValidMatches(data) {
         if (parseInt(player.ZELI_IGRATI_MECEVA) > 0) {
             const remainingMatches = parseInt(player.ZELI_IGRATI_MECEVA);
             let playedMatches = 0;
-
-            logString += `Checking player: ${player.PLAYER_NAME}`;
+          logString += "Checking player";
+           // logString += `Checking player: ${player.PLAYER_NAME}`;
 
             player.TERMINI_IGRACA.forEach((slot) => {
-                logString += `  Checking player's slot: ${slot.dan} ${slot.sat}`;
+               // logString += `  Checking player's slot: ${slot.dan} ${slot.sat}`;
 
                 const clubSlot = clubAvailableSlots.find((clubSlot) => clubSlot.dan === slot.dan && clubSlot.sat === slot.sat);
                 if (clubSlot && playedMatches < remainingMatches) {
-                    logString += `    Found available club slot: ${slot.dan} ${slot.sat}\n`;
-
+                  //  logString += `    Found available club slot: ${slot.dan} ${slot.sat}`;
+                  logString += "Checking remainingMatches:";
                     player.POTENCIJALNI_PROTIVNICI.forEach((opponent) => {
-                        logString += `      Checking opponent: ${opponent}`;
+                      //  logString += `      Checking opponent: ${opponent}`;
 
                         const opponentPlayer = players.find((p) => p.PLAYER_NAME === opponent);
                         if (opponentPlayer) {
                             const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
                             if (opponentSlot) {
-                                logString += `        Found match between ${player.PLAYER_NAME} and ${opponent}`;
+                                  logString += "Checking opponentSlot";
+                              //  logString += `        Found match between ${player.PLAYER_NAME} and ${opponent}`;
                                 matches.push({
                                     player1: player.PLAYER_NAME,
                                     player2: opponent,
