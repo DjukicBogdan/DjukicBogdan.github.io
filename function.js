@@ -2,6 +2,6 @@
 
 
   window.function = function (text) {
-    return text;
+    return {"text":"test"};
   }
 
