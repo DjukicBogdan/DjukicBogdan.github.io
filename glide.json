@@ -1,0 +1,15 @@
+{
+  "name": "Text Length",
+  "description": "Gives the length of a text in characters",
+  "author": "DjukicBogdan",
+  "params": [
+    {
+      "name": "text",
+      "displayName": "Text",
+      "type": "string"
+    }
+  ],
+  "result": {
+    "type": "number"
+  }
+}
