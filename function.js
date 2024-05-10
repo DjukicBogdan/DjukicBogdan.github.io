@@ -50,12 +50,12 @@ function getValidMatches(data) {
         const clubSlot = clubAvailableSlots.find((clubSlot) => clubSlot.dan === slot.dan && clubSlot.sat === slot.sat);
         if (clubSlot && playedMatches < remainingMatches) {
           player.POTENCIJALNI_PROTIVNICI.forEach((opponent) => {
-            const opponentPlayer = players.find((p) => p.PLAYER_NAME === opponent);
+            const opponentPlayer = players.find((p) => p.PLAYER_ID === opponent);
             if (opponentPlayer) {
               const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
               if (opponentSlot) {
                 matches.push({
-                  player1: player.PLAYER_NAME,
+                  player1: player.PLAYER_ID,
                   player2: opponent,
                   time: `${slot.dan} ${slot.sat}`,
                 });
@@ -114,8 +114,8 @@ function prioritizeMatches(matches, priorities, data) {
       case "40":
         // Prioritize players with the most remaining matches
         matches.sort((a, b) => {
-          const player1Matches = data.IGRACI.find((player) => player.PLAYER_NAME === a.player1).PREOSTALO_MECEVA;
-          const player2Matches = data.IGRACI.find((player) => player.PLAYER_NAME === b.player2).PREOSTALO_MECEVA;
+          const player1Matches = data.IGRACI.find((player) => player.PLAYER_ID === a.player1).PREOSTALO_MECEVA;
+          const player2Matches = data.IGRACI.find((player) => player.PLAYER_ID === b.player2).PREOSTALO_MECEVA;
           return player2Matches - player1Matches;
         });
 
