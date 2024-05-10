@@ -1,6 +1,6 @@
 
   window.function = function (text) {
-    string json = {"name":"John", "age":30, "car":"somecar"};
+    let json = {"name":"John", "age":30, "car":"somecar"};
     
     return "JSON.stringify(json)";
   }
