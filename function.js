@@ -4,7 +4,7 @@
 
 
   window.function = function (text) {
-    return handleData(text);
+    return "handleData(text)";
   }
 
 async function handleData(json) {
