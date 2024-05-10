@@ -11,10 +11,8 @@ async function handleData(json) {
     if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
      return "Invalid JSON data format: Missing player information.";
     }
-
     const matches = getValidMatches(json);
     const prioritizedMatches = prioritizeMatches(matches, json.PRIORITETI, json);
-    console.log("Prioritized Matches:", prioritizedMatches);
     return prioritizedMatches;
   } catch (error) {
     return "Error while processing data:"+ error;
