@@ -21,7 +21,7 @@ window.function = async function (text) {
         //if (logString.length === 0) {
            // return "No valid matches found.";
         //}
-        return logString.logString;
+        return logString;
         //const prioritizedMatches = prioritizeMatches(logString);
 
         //return prioritizedMatches;
@@ -30,9 +30,9 @@ window.function = async function (text) {
     }
 
 
-    let result = await handleData(json);
-    let senddata = await result.toString();
-    return senddata;
+   // let result = await handleData(json);
+    //let senddata = await result.toString();
+    //return senddata;
 }
 
 async function handleData(json) {
@@ -98,7 +98,7 @@ function getValidMatches(data) {
     logString += "Finished checking matches.";
 
     // Dodavanje matches u logString kao deo povratne vrednosti
-    return { logString: logString, matches: matches };
+    return  logString;
 }
 
 function prioritizeMatches(matches, priorities, data) {
