@@ -10,6 +10,6 @@
     }
   ],
   "result": {
-    "type": "string"
+    "type": "json"
   }
 }
