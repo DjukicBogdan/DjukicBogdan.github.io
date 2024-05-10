@@ -1,107 +1,61 @@
-window.function = async function (text) {
-    let json = JSON.parse(text.value);
 
-    // Provera da li je JSON objekat validan
-    if (!json || typeof json !== 'object') {
-        return "Invalid JSON data format: Data is not a valid JSON object.";
-    }
-
-    // Provera ostalih neophodnih delova JSON-a
-    if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
-        return "Invalid JSON data format: Missing player information, club slots, or priorities.";
-    }
-
-    try {
-        if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
-            return "Invalid JSON data format: Missing player information.";
-        }
-
-       
-        // Provera da li ima pronađenih mečeva
-        //if (logString.length === 0) {
-           // return "No valid matches found.";
-        //}
-       // return logString;
-        //const prioritizedMatches = prioritizeMatches(logString);
-
-        //return prioritizedMatches;
-    } catch (error) {
-        return "Error while processing data: " + error;
-    }
-
- let logString = await getValidMatches(json); // Dobijanje logString-a umesto matches
-  logString += " kraj string";
-    return await logString.toString();
-   // let result = await handleData(json);
-    //let senddata = await result.toString();
-    //return senddata;
-}
+  window.function = function (text) {
+  let json = JSON.parse(text.value);
+  let result = handleData(json);
+  let senddata = JSON.stringify(result);
+  return senddata;
+  }
 
 async function handleData(json) {
-   // try {
-     //   if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
-     //       return "Invalid JSON data format: Missing player information.";
-     //   }
-      //  const logString = getValidMatches(json); // Dobijanje logString-a umesto matches
-      //  const prioritizedMatches = prioritizeMatches(logString.matches, json.PRIORITETI, json);
-      //  return prioritizedMatches;
-   // } catch (error) {
-  //      return "Error while processing data:" + error;
-  //  }
+  try {
+    if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
+     return "Invalid JSON data format: Missing player information.";
+    }
+    const matches = getValidMatches(json);
+    const prioritizedMatches = prioritizeMatches(matches, json.PRIORITETI, json);
+    return prioritizedMatches;
+  } catch (error) {
+    return "Error while processing data:"+ error;
+  }
 }
 
 function getValidMatches(data) {
-    if (!data || !data.IGRACI || !Array.isArray(data.IGRACI)) {
-        return "Invalid JSON data: Missing player information.";
-    }
+  if (!data || !data.IGRACI || !Array.isArray(data.IGRACI)) {
+    return "Invalid JSON data: Missing player information.";
+  }
 
-    const players = data.IGRACI;
-    const matches = [];
-    const clubAvailableSlots = data.TERMINI_KLUBA;
+  const players = data.IGRACI;
+  const matches = [];
+  const clubAvailableSlots = data.TERMINI_KLUBA;
 
-    let logString = "Pocetak provere igraca."; // Dodato polje za čuvanje logova
+  players.forEach((player) => {
+    if (parseInt(player.ZELI_IGRATI_MECEVA) > 0) {
+      const remainingMatches = parseInt(player.ZELI_IGRATI_MECEVA);
+      let playedMatches = 0;
 
-    players.forEach((player) => {
-        if (parseInt(player.ZELI_IGRATI_MECEVA) > 0) {
-            const remainingMatches = parseInt(player.ZELI_IGRATI_MECEVA);
-            let playedMatches = 0;
-          //logString += "Checking player";
-           // logString += `Checking player: ${player.PLAYER_NAME}`;
-
-            player.TERMINI_IGRACA.forEach((slot) => {
-               // logString += `  Checking player's slot: ${slot.dan} ${slot.sat}`;
-
-                const clubSlot = clubAvailableSlots.find((clubSlot) => clubSlot.dan === slot.dan && clubSlot.sat === slot.sat);
-                if (clubSlot && playedMatches < remainingMatches) {
-                  //  logString += `    Found available club slot: ${slot.dan} ${slot.sat}`;
-                 // logString += "Checking remainingMatches:";
-                    player.POTENCIJALNI_PROTIVNICI.forEach((opponent) => {
-                      //  logString += `      Checking opponent: ${opponent}`;
-
-                        const opponentPlayer = players.find((p) => p.PLAYER_NAME === opponent);
-                        if (opponentPlayer) {
-                            const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
-                            if (opponentSlot) {
-                               //   logString += "Checking opponentSlot";
-                              //  logString += `        Found match between ${player.PLAYER_NAME} and ${opponent}`;
-                                matches.push({
-                                    player1: player.PLAYER_NAME,
-                                    player2: opponent,
-                                    time: `${slot.dan} ${slot.sat}`,
-                                });
-                                playedMatches++;
-                            }
-                        }
-                    });
-                }
-            });
+      player.TERMINI_IGRACA.forEach((slot) => {
+        const clubSlot = clubAvailableSlots.find((clubSlot) => clubSlot.dan === slot.dan && clubSlot.sat === slot.sat);
+        if (clubSlot && playedMatches < remainingMatches) {
+          player.POTENCIJALNI_PROTIVNICI.forEach((opponent) => {
+            const opponentPlayer = players.find((p) => p.PLAYER_NAME === opponent);
+            if (opponentPlayer) {
+              const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
+              if (opponentSlot) {
+                matches.push({
+                  player1: player.PLAYER_NAME,
+                  player2: opponent,
+                  time: `${slot.dan} ${slot.sat}`,
+                });
+                playedMatches++;
+              }
+            }
+          });
         }
-    });
+      });
+    }
+  });
 
-   // logString += "Finished checking matches.";
-
-    // Dodavanje matches u logString kao deo povratne vrednosti
-    return logString;
+  return matches;
 }
 
 function prioritizeMatches(matches, priorities, data) {
@@ -112,8 +66,7 @@ function prioritizeMatches(matches, priorities, data) {
       case "10":
         // Ensure each player plays at least one match
         matches.forEach((match) => {
-          if (!prioritizedMatches.has(match)) {
-            // Use has() to check if a match exists in the Set
+          if (!prioritizedMatches.has(match)) { // Use has() to check if a match exists in the Set
             prioritizedMatches.add(match); // Add match to the Set
           }
         });
@@ -182,8 +135,6 @@ function prioritizeMatches(matches, priorities, data) {
         break;
     }
   }
-  if (prioritizedMatches.size == 0) {
-    return "no prioritizedMatches";
-  }
+
   return Array.from(prioritizedMatches); // Convert the Set back to an array before returning
 }
