@@ -18,9 +18,9 @@ window.function = async function (text) {
 
         const logString = getValidMatches(json); // Dobijanje logString-a umesto matches
         // Provera da li ima pronađenih mečeva
-        if (logString.length === 0) {
-            return "No valid matches found.";
-        }
+        //if (logString.length === 0) {
+           // return "No valid matches found.";
+        //}
 
         const prioritizedMatches = prioritizeMatches(logString.logString);
 
