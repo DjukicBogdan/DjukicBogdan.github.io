@@ -1,5 +1,5 @@
 window.function = async function (text) {
-  let json = text.value.json();
+  let json = JSON.parse(text.value);
 
   // Provera da li je JSON objekat validan
   if (!json || typeof json !== "object") {
