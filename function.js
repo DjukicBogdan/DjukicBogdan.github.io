@@ -52,12 +52,18 @@ function getValidMatches(data) {
             if (opponentPlayer) {
               const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
               if (opponentSlot) {
-                matches.push({
-                  player1: player.PLAYER_ID,
-                  player2: opponent,
-                  time: `${slot.dan} ${slot.sat}`,
-                });
-                playedMatches++;
+                const teren = matches.find((match) => match.courtID === clubSlot.teren);
+                if (!teren) {
+                  matches.push({
+                    player1: player.PLAYER_ID,
+                    player2: opponent,
+                    dayPlayed: slot.dan,
+                    hourPlayed: slot.sat,
+                    courtID: clubSlot.teren,
+                    time: `${slot.dan} ${slot.sat}`,
+                  });
+                  playedMatches++;
+                }
               }
             }
           });
