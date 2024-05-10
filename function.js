@@ -15,8 +15,8 @@
     
   let result = await handleData(json);
   let senddata = await JSON.stringify(result);
-  senddata = senddata.replace(/[\])}[{(]/g, ''); 
-  return await senddata;
+  //senddata = senddata.replace(/[\])}[{(]/g, ''); 
+  return await senddata.toString();
   }
 
 async function handleData(json) {
