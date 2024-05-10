@@ -1,6 +1,8 @@
 
   window.function = function (text) {
-    return {"name":"John", "age":30, "car":"somecar"};
+    string json = {"name":"John", "age":30, "car":"somecar"};
+    
+    return JSON.stringify(json);
   }
 
 async function handleData(json) {
