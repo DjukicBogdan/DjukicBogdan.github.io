@@ -29,7 +29,7 @@ window.function = async function (text) {
         return "Error while processing data: " + error;
     }
 
- const logString = await getValidMatches(json); // Dobijanje logString-a umesto matches
+ let logString = await getValidMatches(json); // Dobijanje logString-a umesto matches
   logString += " kraj string";
     return await logString.toString();
    // let result = await handleData(json);
