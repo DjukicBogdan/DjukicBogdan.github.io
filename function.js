@@ -1,6 +1,27 @@
 
   window.function = async function (text) {
     let json = JSON.parse(text.value);
+
+ try {
+    if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
+     return "Invalid JSON data format: Missing player information.";
+    }
+
+    const matches = getValidMatches(json);
+
+    // Provera da li ima pronađenih mečeva
+    if (matches.length === 0) {
+      return "No valid matches found.";
+    }
+
+    const prioritizedMatches = prioritizeMatches(matches, json.PRIORITETI, json);
+
+    return prioritizedMatches;
+  } catch (error) {
+    return "Error while processing data: " + error;
+  }
+
+    
     let result = await handleData(json);
     let senddata = await result.toString();
     return senddata;
