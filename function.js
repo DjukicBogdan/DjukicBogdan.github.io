@@ -21,7 +21,7 @@ window.function = async function (text) {
         //if (logString.length === 0) {
            // return "No valid matches found.";
         //}
-       // return logString;
+       // return "logString";
         //const prioritizedMatches = prioritizeMatches(logString);
 
         //return prioritizedMatches;
