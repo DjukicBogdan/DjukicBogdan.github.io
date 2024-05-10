@@ -18,7 +18,7 @@
     }
 
     const matches = getValidMatches(json);
-
+     return matches;
     // Provera da li ima pronađenih mečeva
     if (matches.length === 0) {
       return "No valid matches found..";
