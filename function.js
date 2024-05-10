@@ -2,6 +2,16 @@
   window.function = async function (text) {
     let json = JSON.parse(text.value);
 
+    // Provera da li je JSON objekat validan
+        if (!json || typeof json !== 'object') {
+            return "Invalid JSON data format: Data is not a valid JSON object.";
+        }
+
+        // Provera ostalih neophodnih delova JSON-a
+        if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
+            return "Invalid JSON data format: Missing player information, club slots, or priorities.";
+        }
+
  try {
     if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
      return "Invalid JSON data format: Missing player information.";
