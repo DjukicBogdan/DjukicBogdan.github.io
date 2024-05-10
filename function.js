@@ -22,7 +22,7 @@ window.function = async function (text) {
             return "No valid matches found.";
         }
 
-        const prioritizedMatches = prioritizeMatches(logString.matches, json.PRIORITETI, json);
+        const prioritizedMatches = prioritizeMatches(logString.logString);
 
         return prioritizedMatches;
     } catch (error) {
