@@ -1,34 +1,32 @@
-
-  window.function = async function (text) {
+window.function = async function (text) {
   let json = JSON.parse(text.value);
 
-    // Provera da li je JSON objekat validan
-    if (!json || typeof json !== 'object') {
-        return "Invalid JSON data format: Data is not a valid JSON object.";
-    }
+  // Provera da li je JSON objekat validan
+  if (!json || typeof json !== "object") {
+    return "Invalid JSON data format: Data is not a valid JSON object.";
+  }
 
-    // Provera ostalih neophodnih delova JSON-a
-    if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
-        return "Invalid JSON data format: Missing player information, club slots, or priorities.";
-    }
+  // Provera ostalih neophodnih delova JSON-a
+  if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
+    return "Invalid JSON data format: Missing player information, club slots, or priorities.";
+  }
 
-    
   let result = await handleData(json);
   let senddata = await JSON.stringify(result);
-  //senddata = senddata.replace(/[\])}[{(]/g, ''); 
+  //senddata = senddata.replace(/[\])}[{(]/g, '');
   return await senddata.toString();
-  }
+};
 
 async function handleData(json) {
   try {
     if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
-     return "Invalid JSON data format: Missing player information.";
+      return "Invalid JSON data format: Missing player information.";
     }
-    const matches = getValidMatches(json);
-    const prioritizedMatches = prioritizeMatches(matches, json.PRIORITETI, json);
+    const matches = await getValidMatches(json);
+    const prioritizedMatches = await prioritizeMatches(matches, json.PRIORITETI, json);
     return prioritizedMatches;
   } catch (error) {
-    return "Error while processing data:"+ error;
+    return "Error while processing data:" + error;
   }
 }
 
