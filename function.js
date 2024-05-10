@@ -65,7 +65,7 @@ function getValidMatches(data) {
         if (parseInt(player.ZELI_IGRATI_MECEVA) > 0) {
             const remainingMatches = parseInt(player.ZELI_IGRATI_MECEVA);
             let playedMatches = 0;
-          logString += "Checking player";
+          //logString += "Checking player";
            // logString += `Checking player: ${player.PLAYER_NAME}`;
 
             player.TERMINI_IGRACA.forEach((slot) => {
@@ -74,7 +74,7 @@ function getValidMatches(data) {
                 const clubSlot = clubAvailableSlots.find((clubSlot) => clubSlot.dan === slot.dan && clubSlot.sat === slot.sat);
                 if (clubSlot && playedMatches < remainingMatches) {
                   //  logString += `    Found available club slot: ${slot.dan} ${slot.sat}`;
-                  logString += "Checking remainingMatches:";
+                 // logString += "Checking remainingMatches:";
                     player.POTENCIJALNI_PROTIVNICI.forEach((opponent) => {
                       //  logString += `      Checking opponent: ${opponent}`;
 
@@ -82,7 +82,7 @@ function getValidMatches(data) {
                         if (opponentPlayer) {
                             const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
                             if (opponentSlot) {
-                                  logString += "Checking opponentSlot";
+                               //   logString += "Checking opponentSlot";
                               //  logString += `        Found match between ${player.PLAYER_NAME} and ${opponent}`;
                                 matches.push({
                                     player1: player.PLAYER_NAME,
@@ -98,7 +98,7 @@ function getValidMatches(data) {
         }
     });
 
-    logString += "Finished checking matches.";
+   // logString += "Finished checking matches.";
 
     // Dodavanje matches u logString kao deo povratne vrednosti
     return logString;
