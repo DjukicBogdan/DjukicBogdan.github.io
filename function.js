@@ -6,8 +6,7 @@
 window.function = async function (text) {
   let json = JSON.parse(text.value);
   let result = await handleData(json);
-  let senddata = result.toString();
-  return senddata;
+  return JSON.stringify(result);
 };
 
 // Funkcija za obradu podataka
