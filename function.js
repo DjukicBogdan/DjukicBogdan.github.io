@@ -1,35 +1,42 @@
+// Učitavanje JSON podataka
+// fetch("./datagenerisani2.json")
+//   .then((response) => response.json())
+//   .then((json) => handleData(json));
+
 window.function = async function (text) {
   let json = JSON.parse(text.value);
-
-  // Provera da li je JSON objekat validan
-  if (!json || typeof json !== "object") {
-    return "Invalid JSON data format: Data is not a valid JSON object.";
-  }
-
-  // Provera ostalih neophodnih delova JSON-a
-  if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
-    return "Invalid JSON data format: Missing player information, club slots, or priorities.";
-  }
-
   let result = await handleData(json);
-  let senddata = await JSON.stringify(result[0]);
-  //senddata = senddata.replace(/[\])}[{(]/g, '');
-  return await senddata.toString();
+  let senddata = result.toString();
+  return senddata;
 };
 
+// Funkcija za obradu podataka
 async function handleData(json) {
   try {
+    // Provera da li JSON sadrži neophodne informacije
     if (!json || !json.IGRACI || !Array.isArray(json.IGRACI)) {
       return "Invalid JSON data format: Missing player information.";
     }
+
+    // Dobijanje validnih mečeva na osnovu dostupnosti igrača i termina kluba
     const matches = await getValidMatches(json);
+
+    // Prioritizacija mečeva na osnovu prioriteta kluba
     const prioritizedMatches = await prioritizeMatches(matches, json.PRIORITETI, json);
-    return await prioritizedMatches;
+
+    console.log("prioritizedMatches", prioritizedMatches);
+
+    // Pronalaženje svih mogućih kombinacija mečeva
+    const possibleMatches = findAllPossibleMatches(json.IGRACI, json.TERMINI_KLUBA);
+    console.log("Moguće kombinacije mečeva:", possibleMatches);
+
+    return prioritizedMatches;
   } catch (error) {
     return "Error while processing data:" + error;
   }
 }
 
+// Funkcija za dobijanje validnih mečeva
 function getValidMatches(data) {
   if (!data || !data.IGRACI || !Array.isArray(data.IGRACI)) {
     return "Invalid JSON data: Missing player information.";
@@ -52,18 +59,15 @@ function getValidMatches(data) {
             if (opponentPlayer) {
               const opponentSlot = opponentPlayer.TERMINI_IGRACA.find((opponentSlot) => opponentSlot.dan === slot.dan && opponentSlot.sat === slot.sat);
               if (opponentSlot) {
-                const teren = matches.find((match) => match.courtID === clubSlot.teren);
-                if (!teren) {
-                  matches.push({
-                    player1ID: player.PLAYER_ID,
-                    player2ID: opponent,
-                    dayPlayed: slot.dan,
-                    hourPlayed: slot.sat,
-                    courtID: clubSlot.teren,
-                    time: `${slot.dan} ${slot.sat}`,
-                  });
-                  playedMatches++;
-                }
+                matches.push({
+                  player1ID: player.PLAYER_ID,
+                  player2ID: opponent,
+                  dayPlayed: slot.dan,
+                  hourPlayed: slot.sat,
+                  courtID: clubSlot.teren,
+                  time: `${slot.dan} ${slot.sat}`,
+                });
+                playedMatches++;
               }
             }
           });
@@ -74,81 +78,122 @@ function getValidMatches(data) {
 
   return matches;
 }
+
+// Funkcija za prioritizaciju mečeva
 function prioritizeMatches(matches, priorities, data) {
-  const prioritizedMatches = new Set(); // Use a Set to store unique matches
+  const prioritizedMatches = new Set();
+  const usedCourts = new Set();
+
   for (const priority of priorities) {
     switch (priority.id) {
       case "10":
-        // Ensure each player plays at least one match
+        // Obezbedi da svaki igrač igra minimalno jedan meč
         matches.forEach((match) => {
-          if (!prioritizedMatches.has(match)) {
-            // Use has() to check if a match exists in the Set
-            prioritizedMatches.add(match); // Add match to the Set
+          if (!prioritizedMatches.has(match) && !usedCourts.has(match.courtID)) {
+            prioritizedMatches.add(match);
+            usedCourts.add(match.courtID);
           }
         });
         break;
       case "20":
-        // Maximize the number of matches
-        matches.forEach((match) => prioritizedMatches.add(match)); // Add matches to the Set
+        // Maksimizuj broj mečeva
+        matches.forEach((match) => {
+          if (!prioritizedMatches.has(match) && !usedCourts.has(match.courtID)) {
+            prioritizedMatches.add(match);
+            usedCourts.add(match.courtID);
+          }
+        });
         break;
       case "30":
-        // Prioritize morning slots (if required)
+        // Prioritizuj jutarnje termine (ako je potrebno)
         matches.sort((a, b) => {
-          // Extract the hour part from the time string and convert it to a number
           const hourA = parseInt(a.time.split(" ")[1]);
           const hourB = parseInt(b.time.split(" ")[1]);
-
-          // Check if the time is before 12:00 PM
           const isMorningA = hourA <= 12;
           const isMorningB = hourB <= 12;
 
-          // If both matches are in the morning or both are not, sort by time
           if (isMorningA === isMorningB) {
-            // Sort by time (earlier time first)
             return hourA - hourB;
           } else {
-            // Sort morning match first
             return isMorningB ? -1 : 1;
           }
         });
-        matches.forEach((match) => prioritizedMatches.add(match)); // Add matches to the Set
+        matches.forEach((match) => {
+          if (!prioritizedMatches.has(match) && !usedCourts.has(match.courtID)) {
+            prioritizedMatches.add(match);
+            usedCourts.add(match.courtID);
+          }
+        });
         break;
       case "40":
-        // Prioritize players with the most remaining matches
+        // Prioritizuj igrače koji imaju najviše preostalih mečeva
         matches.sort((a, b) => {
           const player1Matches = data.IGRACI.find((player) => player.PLAYER_ID === a.player1ID).PREOSTALO_MECEVA;
           const player2Matches = data.IGRACI.find((player) => player.PLAYER_ID === b.player2ID).PREOSTALO_MECEVA;
           return player2Matches - player1Matches;
         });
 
-        matches.forEach((match) => prioritizedMatches.add(match)); // Add matches to the Set
+        matches.forEach((match) => {
+          if (!prioritizedMatches.has(match) && !usedCourts.has(match.courtID)) {
+            prioritizedMatches.add(match);
+            usedCourts.add(match.courtID);
+          }
+        });
         break;
       case "50":
-        // Prioritize players who have signed up for the most slots
-        // Calculate the number of slots each player has signed up for
+        // Prioritizuj igrače koji su prijavili najviše termina
         const playerSlotsCounts = {};
 
         matches.forEach((match) => {
-          // Increment slot count for player 1
           playerSlotsCounts[match.player1ID] = (playerSlotsCounts[match.player1ID] || 0) + 1;
-          // Increment slot count for player 2
           playerSlotsCounts[match.player2ID] = (playerSlotsCounts[match.player2ID] || 0) + 1;
         });
 
-        // Sort players based on the number of slots they have signed up for
         matches.sort((a, b) => {
           const slotsCountA = playerSlotsCounts[a.player1ID] + playerSlotsCounts[a.player2ID];
           const slotsCountB = playerSlotsCounts[b.player1ID] + playerSlotsCounts[b.player2ID];
-          return slotsCountB - slotsCountA; // Sort in descending order of slot counts
+          return slotsCountB - slotsCountA;
         });
-        matches.forEach((match) => prioritizedMatches.add(match)); // Add matches to the Set
+        matches.forEach((match) => {
+          if (!prioritizedMatches.has(match) && !usedCourts.has(match.courtID)) {
+            prioritizedMatches.add(match);
+            usedCourts.add(match.courtID);
+          }
+        });
         break;
 
-      // Implement other prioritization criteria as needed
       default:
         break;
     }
   }
 
-  return Array.from(prioritizedMatches); // Convert the Set back to an array before returning
+  return Array.from(prioritizedMatches);
+}
+
+// Funkcija za pronalaženje svih mogućih kombinacija mečeva
+function findAllPossibleMatches(players, clubSlots) {
+  const possibleMatches = [];
+
+  // Generisanje svih mogućih parova igrača
+  const playerPairs = [];
+  for (let i = 0; i < players.length; i++) {
+    for (let j = i + 1; j < players.length; j++) {
+      playerPairs.push([players[i], players[j]]);
+    }
+  }
+
+  // Pronalaženje termina za svaki par igrača
+  playerPairs.forEach(([player1, player2]) => {
+    clubSlots.forEach((slot) => {
+      possibleMatches.push({
+        player1ID: player1.PLAYER_ID,
+        player2ID: player2.PLAYER_ID,
+        dayPlayed: slot.dan,
+        hourPlayed: slot.sat,
+        courtID: slot.teren,
+      });
+    });
+  });
+
+  return possibleMatches;
 }
