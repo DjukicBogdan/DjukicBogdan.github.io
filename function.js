@@ -51,7 +51,7 @@ function generateMatches(players, matches, currentMatch, courts) {
             player1.ZELI_IGRATI_MECEVA--;
             player2.ZELI_IGRATI_MECEVA--;
             countIterations++;
-            if (countIterations < 1000) {
+            if (countIterations < 50000) {
               generateMatches(players, matches, currentMatch, courts);
             } else {
               //   console.log(countIterations);
