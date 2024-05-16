@@ -51,7 +51,7 @@ function generateMatches(players, matches, currentMatch, courts) {
             player1.ZELI_IGRATI_MECEVA--;
             player2.ZELI_IGRATI_MECEVA--;
             countIterations++;
-            if (countIterations < 10000) {
+            if (countIterations < 2000) {
               generateMatches(players, matches, currentMatch, courts);
             } else {
               //   console.log(countIterations);
@@ -98,7 +98,7 @@ function allocateCourt(timeSlot) {
 // Start the backtracking process
 
 async function prioritizeMatches(data, prioritizedMatches) {
-  console.log(prioritizedMatches);
+//   console.log(prioritizedMatches);
   bestCombination = null;
   tempBestCombination = 0;
   let totalScore = 0;
@@ -265,7 +265,7 @@ async function prioritizeMatches(data, prioritizedMatches) {
           for (let i = 0; i < data.PRIORITETI.length; i++) {
             totalScore += data.PRIORITETI[i].score;
           }
-          console.log("totalScore: ", totalScore);
+        //   console.log("totalScore: ", totalScore);
           if (tempBestCombination < totalScore) {
             tempBestCombination = totalScore;
             bestCombination = prioritizedMatches[i];
@@ -277,8 +277,8 @@ async function prioritizeMatches(data, prioritizedMatches) {
         break;
     }
   }
-  console.log("bestCombination", bestCombination);
-  console.log("tempBestCombination", tempBestCombination);
+//   console.log("bestCombination", bestCombination);
+//   console.log("tempBestCombination", tempBestCombination);
   // totalScore = P1score * P1weight  + P2score * P2weight ..
   //   console.log("formula: P1-score * P1-weight + P2-score * P2-weight ...");
   //   console.log("weight === json.PRIORITETI(key.priority)");
@@ -314,6 +314,6 @@ async function setData(data) {
   courts = data.TERMINI_KLUBA;
   let result = await generateMatches(players, allMatches, currentMatch, courts);
   let bestCombination = await prioritizeMatches(data, result);
-  // console.log(bestCombination);
+//   console.log(bestCombination);
   return bestCombination;
 }
