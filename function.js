@@ -51,7 +51,7 @@ function generateMatches(players, matches, currentMatch, courts) {
             player1.ZELI_IGRATI_MECEVA--;
             player2.ZELI_IGRATI_MECEVA--;
             countIterations++;
-            if (countIterations < 50000) {
+            if (countIterations < 10000) {
               generateMatches(players, matches, currentMatch, courts);
             } else {
               //   console.log(countIterations);
@@ -121,10 +121,10 @@ async function prioritizeMatches(data, prioritizedMatches) {
           //   console.log(priority);
         }
         if (tempBestCombination < totalScore) {
-            tempBestCombination = totalScore;
-            bestCombination = prioritizedMatches[i];
-          }
-          totalScore = 0;
+          tempBestCombination = totalScore;
+          bestCombination = prioritizedMatches[i];
+        }
+        totalScore = 0;
         break;
       case "20":
         totalScore = 0;
@@ -140,10 +140,10 @@ async function prioritizeMatches(data, prioritizedMatches) {
           //   console.log(priority);
         }
         if (tempBestCombination < totalScore) {
-            tempBestCombination = totalScore;
-            bestCombination = prioritizedMatches[i];
-          }
-          totalScore = 0;
+          tempBestCombination = totalScore;
+          bestCombination = prioritizedMatches[i];
+        }
+        totalScore = 0;
         break;
       case "30":
         totalScore = 0;
@@ -170,10 +170,10 @@ async function prioritizeMatches(data, prioritizedMatches) {
           //   console.log(priority);
         }
         if (tempBestCombination < totalScore) {
-            tempBestCombination = totalScore;
-            bestCombination = prioritizedMatches[i];
-          }
-          totalScore = 0;
+          tempBestCombination = totalScore;
+          bestCombination = prioritizedMatches[i];
+        }
+        totalScore = 0;
         break;
       case "40":
         totalScore = 0;
@@ -216,10 +216,10 @@ async function prioritizeMatches(data, prioritizedMatches) {
           //   console.log(priority);
         }
         if (tempBestCombination < totalScore) {
-            tempBestCombination = totalScore;
-            bestCombination = prioritizedMatches[i];
-          }
-          totalScore = 0;
+          tempBestCombination = totalScore;
+          bestCombination = prioritizedMatches[i];
+        }
+        totalScore = 0;
         break;
       case "50":
         totalScore = 0;
@@ -283,35 +283,37 @@ async function prioritizeMatches(data, prioritizedMatches) {
   //   console.log("formula: P1-score * P1-weight + P2-score * P2-weight ...");
   //   console.log("weight === json.PRIORITETI(key.priority)");
   //   prioritizedMatches.push({"totalScore":totalScore});
-//   console.log(await prioritizedMatches);
+  //   console.log(await prioritizedMatches);
   return await Array.from(bestCombination); // Pretvaramo Set nazad u niz pre vraćanja rezultata
 }
+
 // fetch("./datagenerisani4.json")
 //   .then((response) => response.json())
 //   .then((json) => setData(json));
+
 window.function = async function (text) {
-    let json = JSON.parse(text.value);
+  let json = JSON.parse(text.value);
 
-    // Provera da li je JSON objekat validan
-    if (!json || typeof json !== "object") {
-      return "Invalid JSON data format: Data is not a valid JSON object.";
-    }
-
-    // Provera ostalih neophodnih delova JSON-a
-    if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
-      return "Invalid JSON data format: Missing player information, club slots, or priorities.";
-    }
-
-    let result = await setData(json);
-    let senddata = await JSON.stringify(result[0]);
-    return await senddata.toString();
-  };
-
-  async function setData(data) {
-    players = data.IGRACI;
-    courts = data.TERMINI_KLUBA;
-    let result = await generateMatches(players, allMatches, currentMatch, courts);
-    let bestCombination = await prioritizeMatches(data, result);
-    // console.log(bestCombination);
-    return bestCombination;
+  // Provera da li je JSON objekat validan
+  if (!json || typeof json !== "object") {
+    return "Invalid JSON data format: Data is not a valid JSON object.";
   }
+
+  // Provera ostalih neophodnih delova JSON-a
+  if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
+    return "Invalid JSON data format: Missing player information, club slots, or priorities.";
+  }
+
+  let result = await setData(json);
+  let senddata = await JSON.stringify(result[0]);
+  return await senddata.toString();
+};
+
+async function setData(data) {
+  players = data.IGRACI;
+  courts = data.TERMINI_KLUBA;
+  let result = await generateMatches(players, allMatches, currentMatch, courts);
+  let bestCombination = await prioritizeMatches(data, result);
+  // console.log(bestCombination);
+  return bestCombination;
+}
