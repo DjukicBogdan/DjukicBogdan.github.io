@@ -312,6 +312,6 @@ window.function = async function (text) {
     }
 
     let result = await prioritizeMatches(json);
-    let senddata = await JSON.stringify(result);
+    let senddata = await JSON.stringify(result[0]);
     return await senddata.toString();
   };
