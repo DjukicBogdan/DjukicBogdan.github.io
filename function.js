@@ -314,7 +314,7 @@ window.function = async function (text) {
   }
 
   let result = await setData(json);
-  let senddata = await JSON.stringify(result[0]);
+  let senddata = await JSON.stringify(result);
   return await senddata.toString();
 };
 
