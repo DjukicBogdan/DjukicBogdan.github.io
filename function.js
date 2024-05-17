@@ -46,7 +46,7 @@ function generateMatches(players, matches, currentMatch, courts) {
               player1ID: player1.PLAYER_ID,
               player2ID: player2.PLAYER_ID,
               //   timeSlot: slot,
-              court: allocatedCourt,
+              // court: allocatedCourt,
               dayPlayed: allocatedCourt.dan,
               hourPlayed: allocatedCourt.sat,
               courtID: allocatedCourt.teren,
