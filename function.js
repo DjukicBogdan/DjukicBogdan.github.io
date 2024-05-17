@@ -1,12 +1,12 @@
 let maxCombination = 0;
 let countIterations = 0;
 let timeLimit = 1000;
-let countNumberOfPlayers = 1;
+let countNumberOfPlayers = 0;
 async function generateMatches(players, matches, currentMatch, courts) {
-  // for (let i = 0; i < currentMatch.length; i++) {
-  //   console.log(currentMatch[i]);
-  // }
-  // console.log("----------------------------");
+  for (let i = 0; i < currentMatch.length; i++) {
+    console.log(currentMatch[i]);
+  }
+  console.log("----------------------------");
   // console.log(currentMatch[0]);
   // console.log(players, matches, currentMatch, courts);
   if (currentMatch.length > 0) {
@@ -135,6 +135,7 @@ async function prioritizeMatches(data, prioritizedMatches) {
   if (!prioritizedMatches) {
     return;
   }
+  console.log(prioritizedMatches);
   for (let prioritetiIndex = 0; prioritetiIndex < prioritizedMatches.length; prioritetiIndex++) {
     prioritizedMatches[prioritetiIndex].score = 0;
     for (const priority of priorities) {
@@ -206,6 +207,8 @@ async function prioritizeMatches(data, prioritizedMatches) {
             if (brojPronadjenihJutarnjihMeceva > 0 && klubPonudioJutarnjeTermine > 0) {
               JutarnjiTerminiScore = brojPronadjenihJutarnjihMeceva / klubPonudioJutarnjeTermine;
             }
+            console.log(brojPronadjenihJutarnjihMeceva,klubPonudioJutarnjeTermine);
+
             totalScore = JutarnjiTerminiScore * priority.priority;
             prioritizedMatches[prioritetiIndex].score += totalScore;
           break;
@@ -292,13 +295,7 @@ async function prioritizeMatches(data, prioritizedMatches) {
             }
             BrojPrijavljenihTerminaScore = ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije / ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona;
             totalScore = BrojPrijavljenihTerminaScore * priority.priority;
-            // console.log(totalScore,BrojPrijavljenihTerminaScore);
-            if (tempBestCombination < totalScore) {
-              priority.score = totalScore;
-              tempBestCombination = totalScore;
-              bestCombination = prioritizedMatches[i];
-              priority.bestCombination = prioritizedMatches[i];
-            }
+            prioritizedMatches[prioritetiIndex].score += totalScore;
           }
           break;
         default:
@@ -315,8 +312,8 @@ async function prioritizeMatches(data, prioritizedMatches) {
       maxScoreIndex = i;
     }
   }
-//  console.log("all combinations: ", prioritizedMatches);
-
+ console.log("all combinations: ", prioritizedMatches);
+console.log(maxScoreIndex);
 //   console.log("winner combination: ", prioritizedMatches[maxScoreIndex]);
   return await Array.from(prioritizedMatches[maxScoreIndex]); // Pretvaramo Set nazad u niz pre vraćanja rezultata
 }
@@ -372,7 +369,7 @@ async function setData(data) {
   // console.log("result", result);
 
   let bestCombination = await prioritizeMatches(data, result);
-//   console.log("bestCombination", bestCombination);
+  console.log("bestCombination", bestCombination);
   if (!bestCombination) {
     bestCombination = "no data";
   }
