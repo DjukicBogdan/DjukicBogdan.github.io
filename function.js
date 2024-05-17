@@ -2,28 +2,26 @@ let maxCombination = 0;
 let countIterations = 0;
 let timeLimit = 1000;
 async function generateMatches(players, matches, currentMatch, courts) {
+  // console.log(currentMatch);
+  // console.log(currentMatch[0]);
   // console.log(players, matches, currentMatch, courts);
   if (currentMatch.length > 0) {
     // console.log(currentMatch[0],currentMatch[1]);
     // console.log(maxCombination);
     // console.log(currentMatch.length);
   }
-  if (currentMatch.length === players.length || maxCombination < maxCombination) {
+  if (currentMatch.length === players.length || currentMatch.length > maxCombination) {
     if (maxCombination < currentMatch.length) {
       maxCombination = currentMatch.length;
     }
     // All players processed, add the current match combination
     matches.push([...currentMatch]);
-    // console.log(matches);
-    // console.log(matches[0][0]);
-    // console.log(maxCombination);
-    // console.log(currentMatch[0]);
     return;
   }
-
   const playerIndex = currentMatch.length;
   // console.log(playerIndex);
   const player1 = players[playerIndex];
+  let checkDouble = false;
   for (let player2 of player1.POTENCIJALNI_PROTIVNICI) {
     // console.log(player1);
     player2 = players.find((p) => p.PLAYER_ID === player2);
@@ -31,12 +29,21 @@ async function generateMatches(players, matches, currentMatch, courts) {
     if (!player2) {
       return;
     }
-    // player1.ZELI_IGRATI_MECEVA = parseInt(player1.ZELI_IGRATI_MECEVA);
-    // player2.ZELI_IGRATI_MECEVA = parseInt(player2.ZELI_IGRATI_MECEVA);
-    // player1.PREOSTALO_MECEVA = parseInt(player1.PREOSTALO_MECEVA);
-    // player2.PREOSTALO_MECEVA = parseInt(player2.PREOSTALO_MECEVA);
-    // console.log(player1,player2);
-    if (player1.PREOSTALO_MECEVA > 0 && player2.PREOSTALO_MECEVA > 0 && player1.ZELI_IGRATI_MECEVA > 0 && player2.ZELI_IGRATI_MECEVA > 0) {
+    for (let i = 0; i < currentMatch.length; i++) {
+      // console.log(currentMatch[i]);
+      // console.log(player1,player2);
+      if (currentMatch[i].player1ID === player2.PLAYER_ID) {
+        checkDouble = true;
+        // console.log(currentMatch[i]);
+        return;
+      }
+    }
+    if (checkDouble) {
+      // return;
+    }
+    // console.log(currentMatch[0]);
+    // console.log(player1, player2);
+    if (!checkDouble && player1.PREOSTALO_MECEVA > 0 && player2.PREOSTALO_MECEVA > 0 && player1.ZELI_IGRATI_MECEVA > 0 && player2.ZELI_IGRATI_MECEVA > 0) {
       //   const commonSlots = player1.TERMINI_IGRACA.filter((slot) => player2.TERMINI_IGRACA.includes(slot));
       let termini = [];
       for (let i = 0; i < player1.TERMINI_IGRACA.length; i++) {
@@ -71,7 +78,7 @@ async function generateMatches(players, matches, currentMatch, courts) {
               await generateMatches(players, matches, currentMatch, courts);
               countIterations++;
               // console.log(countIterations);
-              console.log(matches.length);
+              // console.log(matches.length);
             } else {
               return matches;
             }
@@ -116,6 +123,7 @@ function allocateCourt(timeSlot) {
 // Start the backtracking process
 
 async function prioritizeMatches(data, prioritizedMatches) {
+  // console.log(prioritizedMatches);
   bestCombination = null;
   tempBestCombination = 0;
   let totalScore = 0;
@@ -138,7 +146,7 @@ async function prioritizeMatches(data, prioritizedMatches) {
             Min1MecScore = brojIgracaKojimaJeNadjenMec / brojProsledjenihIgraca;
           }
           priority.score = Min1MecScore * priority.priority;
-          //   console.log(priority);
+          // console.log(priority.priority);
         }
         if (tempBestCombination < totalScore) {
           tempBestCombination = totalScore;
@@ -281,7 +289,7 @@ async function prioritizeMatches(data, prioritizedMatches) {
           }
           BrojPrijavljenihTerminaScore = ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije / ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona;
           priority.score = BrojPrijavljenihTerminaScore * priority.priority;
-          //   console.log(priority);
+          // console.log(priority);
           for (let i = 0; i < data.PRIORITETI.length; i++) {
             totalScore += data.PRIORITETI[i].score;
           }
@@ -319,8 +327,8 @@ async function setData(data) {
   } else if (!data.PRIORITETI) {
     return "PRIORITETI in data is null";
   }
-  if (data.timeLimit && data.timeLimit > 100) {
-    timeLimit = data.timeLimit;
+  if (data.TIMEOUT && parseInt(data.TIMEOUT) > 1) {
+    timeLimit = parseInt(data.TIMEOUT) * 1000;
   } else {
     timeLimit = 1000;
   }
@@ -338,21 +346,22 @@ async function setData(data) {
   }
   players = data.IGRACI;
   courts = data.TERMINI_KLUBA;
-  console.log("data", data);
+  // console.log("data", data);
   let result = await generateMatches(players, matches, currentMatch, courts);
-  console.log("result", result);
+  // console.log("result", result);
   if (!result) {
-    result = matches;
+    result = await matches;
   }
+  // console.log("result", result);
   let bestCombination = await prioritizeMatches(data, result);
-  console.log("bestCombination", bestCombination);
+  // console.log("bestCombination", bestCombination);
   if (!bestCombination) {
     bestCombination = "no data";
   }
   return bestCombination;
 }
 
-// fetch("./datagenerisani5.json")
+// fetch("./datagenerisani6.json")
 //   .then((response) => response.json())
 //   .then((json) => setData(json));
 
