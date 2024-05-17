@@ -1,8 +1,12 @@
 let maxCombination = 0;
 let countIterations = 0;
 let timeLimit = 1000;
+let countNumberOfPlayers = 1;
 async function generateMatches(players, matches, currentMatch, courts) {
-  // console.log(currentMatch);
+  // for (let i = 0; i < currentMatch.length; i++) {
+  //   console.log(currentMatch[i]);
+  // }
+  // console.log("----------------------------");
   // console.log(currentMatch[0]);
   // console.log(players, matches, currentMatch, courts);
   if (currentMatch.length > 0) {
@@ -10,10 +14,11 @@ async function generateMatches(players, matches, currentMatch, courts) {
     // console.log(maxCombination);
     // console.log(currentMatch.length);
   }
-  if (currentMatch.length === players.length || currentMatch.length > maxCombination) {
+  if (currentMatch.length > maxCombination || maxCombination > countNumberOfPlayers) {
     if (maxCombination < currentMatch.length) {
       maxCombination = currentMatch.length;
     }
+    // console.log(matches);
     // All players processed, add the current match combination
     matches.push([...currentMatch]);
     return;
@@ -32,7 +37,7 @@ async function generateMatches(players, matches, currentMatch, courts) {
     for (let i = 0; i < currentMatch.length; i++) {
       // console.log(currentMatch[i]);
       // console.log(player1,player2);
-      if (currentMatch[i].player1ID === player2.PLAYER_ID) {
+      if (currentMatch[i].player1ID === player2.PLAYER_ID || currentMatch[i].player2ID === player2.PLAYER_ID) {
         checkDouble = true;
         // console.log(currentMatch[i]);
         return;
@@ -123,7 +128,7 @@ function allocateCourt(timeSlot) {
 // Start the backtracking process
 
 async function prioritizeMatches(data, prioritizedMatches) {
-  // console.log(prioritizedMatches);
+  // console.log("all combinations: ", prioritizedMatches);
   bestCombination = null;
   tempBestCombination = 0;
   let totalScore = 0;
@@ -134,6 +139,7 @@ async function prioritizeMatches(data, prioritizedMatches) {
     switch (priority.id) {
       case "10":
         totalScore = 0;
+        tempBestCombination = 0;
         bestCombination = null;
         if (!prioritizedMatches) {
           return;
@@ -145,17 +151,22 @@ async function prioritizeMatches(data, prioritizedMatches) {
           if (brojIgracaKojimaJeNadjenMec > 0 && brojProsledjenihIgraca > 0) {
             Min1MecScore = brojIgracaKojimaJeNadjenMec / brojProsledjenihIgraca;
           }
-          priority.score = Min1MecScore * priority.priority;
-          // console.log(priority.priority);
+          // console.log(priority.score);
+          totalScore = Min1MecScore * priority.priority;
+          // console.log(priority);
+          if (tempBestCombination < totalScore) {
+            priority.score = totalScore;
+            tempBestCombination = totalScore;
+            bestCombination = prioritizedMatches[i];
+            priority.bestCombination = prioritizedMatches[i];
+          }
         }
-        if (tempBestCombination < totalScore) {
-          tempBestCombination = totalScore;
-          bestCombination = prioritizedMatches[i];
-        }
-        totalScore = 0;
+        // console.log(bestCombination);
+
         break;
       case "20":
         totalScore = 0;
+        tempBestCombination = 0;
         bestCombination = null;
         for (let i = 0; i < prioritizedMatches.length; i++) {
           let brojPronadjenihMeceva = prioritizedMatches[i].length;
@@ -164,17 +175,20 @@ async function prioritizeMatches(data, prioritizedMatches) {
           if (brojPronadjenihMeceva > 0 && klubPonudioTermine > 0) {
             MaxMecScore = brojPronadjenihMeceva / klubPonudioTermine;
           }
-          priority.score = MaxMecScore * priority.priority;
+          totalScore = MaxMecScore * priority.priority;
+          // console.log(priority.score);
           //   console.log(priority);
+          if (tempBestCombination < totalScore) {
+            priority.score = totalScore;
+            tempBestCombination = totalScore;
+            bestCombination = prioritizedMatches[i];
+            priority.bestCombination = prioritizedMatches[i];
+          }
         }
-        if (tempBestCombination < totalScore) {
-          tempBestCombination = totalScore;
-          bestCombination = prioritizedMatches[i];
-        }
-        totalScore = 0;
         break;
       case "30":
         totalScore = 0;
+        tempBestCombination = 0;
         bestCombination = null;
         for (let i = 0; i < prioritizedMatches.length; i++) {
           let brojPronadjenihJutarnjihMeceva = 0;
@@ -183,28 +197,33 @@ async function prioritizeMatches(data, prioritizedMatches) {
 
           for (let j = 0; j < prioritizedMatches[i].length; j++) {
             if (prioritizedMatches[i][j].hourPlayed < 12) {
-              brojPronadjenihJutarnjihMeceva += Number(prioritizedMatches[i][j].hourPlayed);
+              brojPronadjenihJutarnjihMeceva++;
             }
           }
           for (let i = 0; i < data.TERMINI_KLUBA.length; i++) {
             if (Number(data.TERMINI_KLUBA[i].sat) < 12) {
-              klubPonudioJutarnjeTermine += Number(data.TERMINI_KLUBA[i].sat);
+              klubPonudioJutarnjeTermine++;
             }
           }
           if (brojPronadjenihJutarnjihMeceva > 0 && klubPonudioJutarnjeTermine > 0) {
             JutarnjiTerminiScore = brojPronadjenihJutarnjihMeceva / klubPonudioJutarnjeTermine;
           }
-          priority.score = JutarnjiTerminiScore * priority.priority;
+          totalScore = JutarnjiTerminiScore * priority.priority;
+          // console.log(JutarnjiTerminiScore, brojPronadjenihJutarnjihMeceva, klubPonudioJutarnjeTermine);
+          // console.log(priority.score);
           //   console.log(priority);
+          if (tempBestCombination < totalScore) {
+            priority.score = totalScore;
+            tempBestCombination = totalScore;
+            bestCombination = prioritizedMatches[i];
+            priority.bestCombination = prioritizedMatches[i];
+          }
         }
-        if (tempBestCombination < totalScore) {
-          tempBestCombination = totalScore;
-          bestCombination = prioritizedMatches[i];
-        }
-        totalScore = 0;
+
         break;
       case "40":
         totalScore = 0;
+        tempBestCombination = 0;
         bestCombination = null;
         for (let i = 0; i < prioritizedMatches.length; i++) {
           let ukupanBrojProstalihMecevaZaSveIgraceIzKombinacije = 0;
@@ -240,17 +259,18 @@ async function prioritizeMatches(data, prioritizedMatches) {
             ukupanBrojProstalihMecevaZaSveIgraceIzJsona += Number(data.IGRACI[i].PREOSTALO_MECEVA);
           }
           BrojPreostalihMecevaScore = ukupanBrojProstalihMecevaZaSveIgraceIzKombinacije / ukupanBrojProstalihMecevaZaSveIgraceIzJsona;
-          priority.score = BrojPreostalihMecevaScore * priority.priority;
-          //   console.log(priority);
+          totalScore = BrojPreostalihMecevaScore * priority.priority;
+          if (tempBestCombination < totalScore) {
+            priority.score = totalScore;
+            tempBestCombination = totalScore;
+            bestCombination = prioritizedMatches[i];
+            priority.bestCombination = prioritizedMatches[i];
+          }
         }
-        if (tempBestCombination < totalScore) {
-          tempBestCombination = totalScore;
-          bestCombination = prioritizedMatches[i];
-        }
-        totalScore = 0;
         break;
       case "50":
         totalScore = 0;
+        tempBestCombination = 0;
         bestCombination = null;
         for (let i = 0; i < prioritizedMatches.length; i++) {
           let ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije = 0;
@@ -288,31 +308,31 @@ async function prioritizeMatches(data, prioritizedMatches) {
           if (ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije > 0 && ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona > 0) {
           }
           BrojPrijavljenihTerminaScore = ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije / ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona;
-          priority.score = BrojPrijavljenihTerminaScore * priority.priority;
-          // console.log(priority);
-          for (let i = 0; i < data.PRIORITETI.length; i++) {
-            totalScore += data.PRIORITETI[i].score;
-          }
-          //   console.log("totalScore: ", totalScore);
+          totalScore = BrojPrijavljenihTerminaScore * priority.priority;
+          // console.log(totalScore,BrojPrijavljenihTerminaScore);
           if (tempBestCombination < totalScore) {
+            priority.score = totalScore;
             tempBestCombination = totalScore;
             bestCombination = prioritizedMatches[i];
+            priority.bestCombination = prioritizedMatches[i];
           }
-          totalScore = 0;
         }
         break;
       default:
         break;
     }
   }
-  //   console.log("bestCombination", bestCombination);
-  //   console.log("tempBestCombination", tempBestCombination);
-  // totalScore = P1score * P1weight  + P2score * P2weight ..
-  //   console.log("formula: P1-score * P1-weight + P2-score * P2-weight ...");
-  //   console.log("weight === json.PRIORITETI(key.priority)");
-  //   prioritizedMatches.push({"totalScore":totalScore});
-  //   console.log(await prioritizedMatches);
-  return await Array.from(bestCombination); // Pretvaramo Set nazad u niz pre vraćanja rezultata
+  // console.log("priorities", priorities);
+  let maxScore = 0;
+  maxScoreIndex = 0;
+  for (let i = 0; i < data.PRIORITETI.length; i++) {
+    if (maxScore < data.PRIORITETI[i].score) {
+      maxScore = data.PRIORITETI[i].score;
+      maxScoreIndex = i;
+    }
+  }
+  // console.log("winner combination: ", data.PRIORITETI[maxScoreIndex]);
+  return await Array.from(data.PRIORITETI[maxScoreIndex].bestCombination); // Pretvaramo Set nazad u niz pre vraćanja rezultata
 }
 
 async function setData(data) {
@@ -344,41 +364,59 @@ async function setData(data) {
     data.TERMINI_KLUBA[i].dan = parseInt(data.TERMINI_KLUBA[i].dan);
     data.TERMINI_KLUBA[i].sat = parseInt(data.TERMINI_KLUBA[i].sat);
   }
+  for (let i = 0; i < data.PRIORITETI.length; i++) {
+    data.PRIORITETI[i].priority = parseInt(data.PRIORITETI[i].priority);
+     data.PRIORITETI[i].score = 0;
+     data.PRIORITETI[i].bestCombination = null;
+  }
+  // console.log(data);
   players = data.IGRACI;
   courts = data.TERMINI_KLUBA;
   // console.log("data", data);
-  let result = await generateMatches(players, matches, currentMatch, courts);
+  let result;
+  for (let i = 0; i < data.IGRACI.length; i++) {
+    countNumberOfPlayers++;
+    maxCombination = 0;
+    result = await generateMatches(players, matches, currentMatch, courts);
+  }
   // console.log("result", result);
   if (!result) {
     result = await matches;
   }
   // console.log("result", result);
+
   let bestCombination = await prioritizeMatches(data, result);
-  // console.log("bestCombination", bestCombination);
+  console.log("bestCombination", bestCombination);
   if (!bestCombination) {
     bestCombination = "no data";
   }
   return bestCombination;
 }
 
-// fetch("./datagenerisani6.json")
-//   .then((response) => response.json())
-//   .then((json) => setData(json));
+const dev = 1;
 
-window.function = async function (text) {
-  let json = JSON.parse(text.value);
+if (dev === 0) {
+  fetch("./datagenerisani6.json")
+    .then((response) => response.json())
+    .then((json) => setData(json));
+}
 
-  // Provera da li je JSON objekat validan
-  if (!json || typeof json !== "object") {
-    return "Invalid JSON data format: Data is not a valid JSON object.";
-  }
+if (dev === 1) {
+  window.function = async function (text) {
+    let json = JSON.parse(text.value);
 
-  // Provera ostalih neophodnih delova JSON-a
-  if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
-    return "Invalid JSON data format: Missing player information, club slots, or priorities.";
-  }
+    // Provera da li je JSON objekat validan
+    if (!json || typeof json !== "object") {
+      return "Invalid JSON data format: Data is not a valid JSON object.";
+    }
 
-  let result = await setData(json);
-  let senddata = await JSON.stringify(result);
-  return await senddata.toString();
-};
+    // Provera ostalih neophodnih delova JSON-a
+    if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
+      return "Invalid JSON data format: Missing player information, club slots, or priorities.";
+    }
+
+    let result = await setData(json);
+    let senddata = await JSON.stringify(result);
+    return await senddata.toString();
+  };
+}
