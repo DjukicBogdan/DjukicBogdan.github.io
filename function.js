@@ -256,20 +256,22 @@ async function prioritizeMatches(data, prioritizedMatches) {
   let maxScore = 0;
   maxScoreIndex = 0;
   for (let i = 0; i < prioritizedMatches.length; i++) {
-    if (maxScore < prioritizedMatches[i].score) {
+    if (prioritizedMatches[i].score && maxScore < prioritizedMatches[i].score) {
       maxScore = prioritizedMatches[i].score;
       maxScoreIndex = i;
     }
   }
-  for (let i = 0; i < prioritizedMatches.length; i++) {
-    let check = false;
-    for (let j = 0; j < prioritizedMatches[i].length; j++) {
-      if (prioritizedMatches[i].length > 2 && prioritizedMatches[i][j].hourPlayed > 11) {
-        check = true;
-      }
-    }
-  }
-  if (await Array.from(!prioritizedMatches[maxScoreIndex])) {
+//   console.log(prioritizedMatches[maxScoreIndex]);
+
+//   for (let i = 0; i < prioritizedMatches.length; i++) {
+//     let check = false;
+//     for (let j = 0; j < prioritizedMatches[i].length; j++) {
+//       if (prioritizedMatches[i].length > 2 && prioritizedMatches[i][j].hourPlayed > 11) {
+//         check = true;
+//       }
+//     }
+//   }
+  if (await !prioritizedMatches[maxScoreIndex]) {
     return "no data";
   }
   return await Array.from(prioritizedMatches[maxScoreIndex]); // Pretvaramo Set nazad u niz pre vraćanja rezultata
@@ -331,7 +333,7 @@ async function setData(data) {
   }
 //   console.log("result", result);
   let bestCombination = await prioritizeMatches(data, result);
-  console.log("bestCombination", bestCombination);
+//   console.log("bestCombination", bestCombination);
   if (!bestCombination) {
     bestCombination = "no data";
   }
