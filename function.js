@@ -1,19 +1,29 @@
 let maxCombination = 0;
-function generateMatches(players, matches, currentMatch, courts) {
+let countIterations = 0;
+let timeLimit = 1000;
+async function generateMatches(players, matches, currentMatch, courts) {
   // console.log(players, matches, currentMatch, courts);
-
-  if (currentMatch.length === players.length || currentMatch.length === players.length - 1 || maxCombination < currentMatch.length) {
+  if (currentMatch.length > 0) {
+    // console.log(currentMatch[0],currentMatch[1]);
+    // console.log(maxCombination);
+    // console.log(currentMatch.length);
+  }
+  if (currentMatch.length === players.length || maxCombination < maxCombination) {
     if (maxCombination < currentMatch.length) {
       maxCombination = currentMatch.length;
     }
     // All players processed, add the current match combination
     matches.push([...currentMatch]);
+    // console.log(matches);
+    // console.log(matches[0][0]);
+    // console.log(maxCombination);
+    // console.log(currentMatch[0]);
     return;
   }
 
   const playerIndex = currentMatch.length;
+  // console.log(playerIndex);
   const player1 = players[playerIndex];
-
   for (let player2 of player1.POTENCIJALNI_PROTIVNICI) {
     // console.log(player1);
     player2 = players.find((p) => p.PLAYER_ID === player2);
@@ -56,12 +66,14 @@ function generateMatches(players, matches, currentMatch, courts) {
             player2.PREOSTALO_MECEVA--;
             player1.ZELI_IGRATI_MECEVA--;
             player2.ZELI_IGRATI_MECEVA--;
-            countIterations++;
-            if (countIterations < 2000) {
-              generateMatches(players, matches, currentMatch, courts);
+            if (countIterations < timeLimit) {
+              // maxCombination = 0;
+              await generateMatches(players, matches, currentMatch, courts);
+              countIterations++;
+              // console.log(countIterations);
+              console.log(matches.length);
             } else {
-              //   console.log(countIterations);
-              return allMatches;
+              return matches;
             }
             // Backtrack: restore state
             player1.PREOSTALO_MECEVA++;
@@ -76,9 +88,9 @@ function generateMatches(players, matches, currentMatch, courts) {
     }
   }
 }
-let countIterations = 0;
 
 // Example usage:
+const matches = [];
 const allMatches = [];
 const currentMatch = [];
 const allTimeSlots = [
@@ -104,7 +116,6 @@ function allocateCourt(timeSlot) {
 // Start the backtracking process
 
 async function prioritizeMatches(data, prioritizedMatches) {
-  //   console.log(prioritizedMatches);
   bestCombination = null;
   tempBestCombination = 0;
   let totalScore = 0;
@@ -296,7 +307,52 @@ async function prioritizeMatches(data, prioritizedMatches) {
   return await Array.from(bestCombination); // Pretvaramo Set nazad u niz pre vraćanja rezultata
 }
 
-// fetch("./datagenerisani6.json")
+async function setData(data) {
+  if (!data) {
+    return "data is null";
+  } else if (!data || typeof data !== "object") {
+    return "Invalid JSON data format: Data is not a valid JSON object.";
+  } else if (!data.IGRACI) {
+    return "IGRACI in data is null";
+  } else if (!data.TERMINI_KLUBA) {
+    return "TERMINI_KLUBA in data is null";
+  } else if (!data.PRIORITETI) {
+    return "PRIORITETI in data is null";
+  }
+  if (data.timeLimit && data.timeLimit > 100) {
+    timeLimit = data.timeLimit;
+  } else {
+    timeLimit = 1000;
+  }
+  for (let i = 0; i < data.IGRACI.length; i++) {
+    data.IGRACI[i].ZELI_IGRATI_MECEVA = parseInt(data.IGRACI[i].ZELI_IGRATI_MECEVA);
+    data.IGRACI[i].PREOSTALO_MECEVA = parseInt(data.IGRACI[i].PREOSTALO_MECEVA);
+    for (let j = 0; j < data.IGRACI[i].TERMINI_IGRACA.length; j++) {
+      data.IGRACI[i].TERMINI_IGRACA[j].sat = parseInt(data.IGRACI[i].TERMINI_IGRACA[j].sat);
+      data.IGRACI[i].TERMINI_IGRACA[j].dan = parseInt(data.IGRACI[i].TERMINI_IGRACA[j].dan);
+    }
+  }
+  for (let i = 0; i < data.TERMINI_KLUBA.length; i++) {
+    data.TERMINI_KLUBA[i].dan = parseInt(data.TERMINI_KLUBA[i].dan);
+    data.TERMINI_KLUBA[i].sat = parseInt(data.TERMINI_KLUBA[i].sat);
+  }
+  players = data.IGRACI;
+  courts = data.TERMINI_KLUBA;
+  console.log("data", data);
+  let result = await generateMatches(players, matches, currentMatch, courts);
+  console.log("result", result);
+  if (!result) {
+    result = matches;
+  }
+  let bestCombination = await prioritizeMatches(data, result);
+  console.log("bestCombination", bestCombination);
+  if (!bestCombination) {
+    bestCombination = "no data";
+  }
+  return bestCombination;
+}
+
+// fetch("./datagenerisani5.json")
 //   .then((response) => response.json())
 //   .then((json) => setData(json));
 
@@ -317,28 +373,3 @@ window.function = async function (text) {
   let senddata = await JSON.stringify(result);
   return await senddata.toString();
 };
-
-async function setData(data) {
-  for (let i = 0; i < data.IGRACI.length; i++) {
-    data.IGRACI[i].ZELI_IGRATI_MECEVA = parseInt(data.IGRACI[i].ZELI_IGRATI_MECEVA);
-    data.IGRACI[i].PREOSTALO_MECEVA = parseInt(data.IGRACI[i].PREOSTALO_MECEVA);
-    for (let j = 0; j < data.IGRACI[i].TERMINI_IGRACA.length; j++) {
-      data.IGRACI[i].TERMINI_IGRACA[j].sat = parseInt(data.IGRACI[i].TERMINI_IGRACA[j].sat);
-      data.IGRACI[i].TERMINI_IGRACA[j].dan = parseInt(data.IGRACI[i].TERMINI_IGRACA[j].dan);
-    }
-  }
-  for (let i = 0; i < data.TERMINI_KLUBA.length; i++) {
-    data.TERMINI_KLUBA[i].dan = parseInt(data.TERMINI_KLUBA[i].dan);
-    data.TERMINI_KLUBA[i].sat = parseInt(data.TERMINI_KLUBA[i].sat);
-  }
-  players = data.IGRACI;
-  courts = data.TERMINI_KLUBA;
-  console.log(data);
-  let result = await generateMatches(players, allMatches, currentMatch, courts);
-  let bestCombination = await prioritizeMatches(data, result);
-  console.log(bestCombination);
-  if (!bestCombination) {
-    bestCombination = "no data";
-  }
-  return bestCombination;
-}
