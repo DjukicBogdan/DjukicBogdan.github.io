@@ -53,7 +53,9 @@ async function generateMatches(players, matches, currentMatch, courts) {
             if (countIterations < timeLimit) {
               await generateMatches(players, matches, currentMatch, courts);
               countIterations++;
+              // console.log("countIterations", countIterations);
             } else {
+              // console.log("countIterations", countIterations);
               return matches;
             }
             // Backtrack: restore state
@@ -104,8 +106,25 @@ async function prioritizeMatches(data, prioritizedMatches) {
   if (!prioritizedMatches) {
     return;
   }
-    // console.log(prioritizedMatches);
+  let brojProsledjenihIgraca = data.IGRACI.length;
+  let klubPonudioTermine = data.TERMINI_KLUBA.length;
+  let klubPonudioJutarnjeTermine = 0;
+  for (let i = 0; i < data.TERMINI_KLUBA.length; i++) {
+    if (Number(data.TERMINI_KLUBA[i].sat) < 12) {
+      klubPonudioJutarnjeTermine++;
+    }
+  }
+  let ukupanBrojProstalihMecevaZaSveIgraceIzJsona = 0;
+  for (let i = 0; i < data.IGRACI.length; i++) {
+    ukupanBrojProstalihMecevaZaSveIgraceIzJsona += Number(data.IGRACI[i].PREOSTALO_MECEVA);
+  }
+  let ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona = 0;
+  for (let i = 0; i < data.IGRACI.length; i++) {
+    ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona += Number(data.IGRACI[i].PREOSTALO_MECEVA);
+  }
+  // console.log(prioritizedMatches);
   for (let prioritetiIndex = 0; prioritetiIndex < prioritizedMatches.length; prioritetiIndex++) {
+   
     prioritizedMatches[prioritetiIndex].score = 0;
     for (const priority of priorities) {
       switch (priority.id) {
@@ -115,7 +134,6 @@ async function prioritizeMatches(data, prioritizedMatches) {
           bestCombination = null;
 
           let brojIgracaKojimaJeNadjenMec = [...new Set(prioritizedMatches[prioritetiIndex].map((item) => item.player1ID))].length;
-          let brojProsledjenihIgraca = data.IGRACI.length;
           let Min1MecScore = 0;
           if (brojIgracaKojimaJeNadjenMec > 0 && brojProsledjenihIgraca > 0) {
             Min1MecScore = brojIgracaKojimaJeNadjenMec / brojProsledjenihIgraca;
@@ -129,7 +147,6 @@ async function prioritizeMatches(data, prioritizedMatches) {
           bestCombination = null;
 
           let brojPronadjenihMeceva = prioritizedMatches[prioritetiIndex].length;
-          let klubPonudioTermine = data.TERMINI_KLUBA.length;
           let MaxMecScore = 0;
           if (brojPronadjenihMeceva > 0 && klubPonudioTermine > 0) {
             MaxMecScore = brojPronadjenihMeceva / klubPonudioTermine;
@@ -142,7 +159,6 @@ async function prioritizeMatches(data, prioritizedMatches) {
           tempBestCombination = 0;
           bestCombination = null;
           let brojPronadjenihJutarnjihMeceva = 0;
-          let klubPonudioJutarnjeTermine = 0;
           let JutarnjiTerminiScore = 0;
 
           for (let j = 0; j < prioritizedMatches[prioritetiIndex].length; j++) {
@@ -150,15 +166,9 @@ async function prioritizeMatches(data, prioritizedMatches) {
               brojPronadjenihJutarnjihMeceva++;
             }
           }
-          for (let i = 0; i < data.TERMINI_KLUBA.length; i++) {
-            if (Number(data.TERMINI_KLUBA[i].sat) < 12) {
-              klubPonudioJutarnjeTermine++;
-            }
-          }
           if (brojPronadjenihJutarnjihMeceva > 0 && klubPonudioJutarnjeTermine > 0) {
             JutarnjiTerminiScore = brojPronadjenihJutarnjihMeceva / klubPonudioJutarnjeTermine;
           }
-
           totalScore = JutarnjiTerminiScore * priority.priority;
           prioritizedMatches[prioritetiIndex].score += totalScore;
           break;
@@ -168,7 +178,6 @@ async function prioritizeMatches(data, prioritizedMatches) {
           bestCombination = null;
 
           let ukupanBrojProstalihMecevaZaSveIgraceIzKombinacije = 0;
-          let ukupanBrojProstalihMecevaZaSveIgraceIzJsona = 0;
           let BrojPreostalihMecevaScore = 0;
 
           let ListaSvihIgracaUKombinaciji = [];
@@ -196,57 +205,49 @@ async function prioritizeMatches(data, prioritizedMatches) {
             let igrac = data.IGRACI.find((igr) => igr.PLAYER_ID == unikatnaListaSvihIgracaUKombinaciji[i].igrac);
             ukupanBrojProstalihMecevaZaSveIgraceIzKombinacije += Number(igrac.PREOSTALO_MECEVA);
           }
-          for (let i = 0; i < data.IGRACI.length; i++) {
-            ukupanBrojProstalihMecevaZaSveIgraceIzJsona += Number(data.IGRACI[i].PREOSTALO_MECEVA);
-          }
+
           BrojPreostalihMecevaScore = ukupanBrojProstalihMecevaZaSveIgraceIzKombinacije / ukupanBrojProstalihMecevaZaSveIgraceIzJsona;
           totalScore = BrojPreostalihMecevaScore * priority.priority;
           prioritizedMatches[prioritetiIndex].score += totalScore;
-
           break;
         case "50":
           totalScore = 0;
           tempBestCombination = 0;
           bestCombination = null;
-          for (let i = 0; i < prioritizedMatches.length; i++) {
-            let ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije = 0;
-            let ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona = 0;
-            let BrojPrijavljenihTerminaScore = 0;
+          let ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije = 0;
+          let BrojPrijavljenihTerminaScore = 0;
 
-            let ListaSvihIgracaUKombinacijiPrijavljenihTermina = [];
-            for (let j = 0; j < prioritizedMatches[i].length; j++) {
-              ListaSvihIgracaUKombinacijiPrijavljenihTermina.push(prioritizedMatches[i][j].player1ID);
-              ListaSvihIgracaUKombinacijiPrijavljenihTermina.push(prioritizedMatches[i][j].player2ID);
-            }
-            let unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina = [];
-            for (let i = 0; i < ListaSvihIgracaUKombinacijiPrijavljenihTermina.length; i++) {
-              let count = 0;
-              for (let j = 0; j < unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.length; j++) {
-                if (unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina[j] && ListaSvihIgracaUKombinacijiPrijavljenihTermina[i] == unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina[j].igrac) {
-                  count++;
-                }
-              }
-              if (count == 0) {
-                unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.push({ igrac: ListaSvihIgracaUKombinacijiPrijavljenihTermina[i], ponavljanje: 1 });
-              } else {
-                let p = unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.find((igrac) => igrac.igrac == ListaSvihIgracaUKombinacijiPrijavljenihTermina[i]);
-                p.ponavljanje += count;
-              }
-              count = 0;
-            }
-            for (let i = 0; i < unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.length; i++) {
-              let igrac = data.IGRACI.find((igr) => igr.PLAYER_ID == unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina[i].igrac);
-              ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije += Number(igrac.PREOSTALO_MECEVA);
-            }
-            for (let i = 0; i < data.IGRACI.length; i++) {
-              ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona += Number(data.IGRACI[i].PREOSTALO_MECEVA);
-            }
-            if (ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije > 0 && ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona > 0) {
-            }
-            BrojPrijavljenihTerminaScore = ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije / ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona;
-            totalScore = BrojPrijavljenihTerminaScore * priority.priority;
-            prioritizedMatches[prioritetiIndex].score += totalScore;
+          let ListaSvihIgracaUKombinacijiPrijavljenihTermina = [];
+          for (let j = 0; j < prioritizedMatches[prioritetiIndex].length; j++) {
+            ListaSvihIgracaUKombinacijiPrijavljenihTermina.push(prioritizedMatches[prioritetiIndex][j].player1ID);
+            ListaSvihIgracaUKombinacijiPrijavljenihTermina.push(prioritizedMatches[prioritetiIndex][j].player2ID);
           }
+          let unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina = [];
+          for (let i = 0; i < ListaSvihIgracaUKombinacijiPrijavljenihTermina.length; i++) {
+            let count = 0;
+            for (let j = 0; j < unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.length; j++) {
+              if (unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina[j] && ListaSvihIgracaUKombinacijiPrijavljenihTermina[i] == unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina[j].igrac) {
+                count++;
+              }
+            }
+            if (count == 0) {
+              unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.push({ igrac: ListaSvihIgracaUKombinacijiPrijavljenihTermina[i], ponavljanje: 1 });
+            } else {
+              let p = unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.find((igrac) => igrac.igrac == ListaSvihIgracaUKombinacijiPrijavljenihTermina[i]);
+              p.ponavljanje += count;
+            }
+            count = 0;
+          }
+          for (let i = 0; i < unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina.length; i++) {
+            let igrac = data.IGRACI.find((igr) => igr.PLAYER_ID == unikatnaListaSvihIgracaUKombinacijiPrijavljenihTermina[i].igrac);
+            ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije += Number(igrac.PREOSTALO_MECEVA);
+          }
+
+          if (ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije > 0 && ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona > 0) {
+          }
+          BrojPrijavljenihTerminaScore = ukupanBrojPrijavljenihTerminaZaSveIgraceIzKombinacije / ukupanBrojPrijavljenihTerminaZaSveIgraceIzJsona;
+          totalScore = BrojPrijavljenihTerminaScore * priority.priority;
+          prioritizedMatches[prioritetiIndex].score += totalScore;
           break;
         default:
           break;
@@ -261,20 +262,121 @@ async function prioritizeMatches(data, prioritizedMatches) {
       maxScoreIndex = i;
     }
   }
-//   console.log(prioritizedMatches[maxScoreIndex]);
+  //   console.log(prioritizedMatches[maxScoreIndex]);
 
-//   for (let i = 0; i < prioritizedMatches.length; i++) {
-//     let check = false;
-//     for (let j = 0; j < prioritizedMatches[i].length; j++) {
-//       if (prioritizedMatches[i].length > 2 && prioritizedMatches[i][j].hourPlayed > 11) {
-//         check = true;
-//       }
-//     }
-//   }
+  //   for (let i = 0; i < prioritizedMatches.length; i++) {
+  //     let check = false;
+  //     for (let j = 0; j < prioritizedMatches[i].length; j++) {
+  //       if (prioritizedMatches[i].length > 2 && prioritizedMatches[i][j].hourPlayed > 11) {
+  //         check = true;
+  //       }
+  //     }
+  //   }
   if (await !prioritizedMatches[maxScoreIndex]) {
     return "no data";
   }
+
   return await Array.from(prioritizedMatches[maxScoreIndex]); // Pretvaramo Set nazad u niz pre vraćanja rezultata
+}
+
+// Funkcija za pronalaženje svih mogućih kombinacija mečeva
+function findAllPossibleMatches(players, clubSlots) {
+  const possibleMatches = [];
+
+  // Generisanje svih mogućih parova igrača
+  const playerPairs = [];
+  for (let i = 0; i < players.length; i++) {
+    for (let j = i + 1; j < players.length; j++) {
+      const Igrac1 = players[i];
+      const Igrac2 = players[j];
+      for (let k = 0; k < Igrac1.TERMINI_IGRACA.length; k++) {
+        for (let l = 0; l < Igrac2.TERMINI_IGRACA.length; l++) {
+          if (Igrac1.TERMINI_IGRACA[k].sat === Igrac2.TERMINI_IGRACA[l].sat && Igrac1.TERMINI_IGRACA[k].dan === Igrac2.TERMINI_IGRACA[l].dan) {
+            for (let m = 0; m < Igrac1.POTENCIJALNI_PROTIVNICI.length; m++) {
+              for (let n = 0; n < Igrac2.POTENCIJALNI_PROTIVNICI.length; n++) {
+                if (Igrac1.POTENCIJALNI_PROTIVNICI[m] === Igrac2.PLAYER_ID) {
+                  playerPairs.push([players[i], players[j]]);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Pronalaženje termina za svaki par igrača
+  playerPairs.forEach(([player1, player2]) => {
+    clubSlots.forEach((slot) => {
+      const terminiIgrac1 = player1.TERMINI_IGRACA;
+      const terminiIgrac2 = player2.TERMINI_IGRACA;
+      for (let k = 0; k < terminiIgrac1.length; k++) {
+        for (let l = 0; l < terminiIgrac2.length; l++) {
+          if (terminiIgrac1[k].sat === terminiIgrac2[l].sat && terminiIgrac1[k].dan === terminiIgrac2[l].dan && slot.dan === terminiIgrac1[k].dan && slot.sat === terminiIgrac1[k].sat) {
+            possibleMatches.push({
+              player1ID: player1.PLAYER_ID,
+              player2ID: player2.PLAYER_ID,
+              dayPlayed: slot.dan,
+              hourPlayed: slot.sat,
+              courtID: slot.teren,
+              isValid: false,
+            });
+            break;
+          }
+        }
+      }
+    });
+  });
+  return possibleMatches;
+}
+// Funkcija za maksimizaciju broja mečeva
+function maximizeMatches(matches, igraci2, termini2) {
+  // svaki igrac igra sa drugim protivnikom neki drugi dan u slobodnom terminu
+  const usedCourts = [];
+  const TERMINI_KLUBA = Array.from(termini2);
+  const court = TERMINI_KLUBA;
+  court.forEach((c) => (c.isUsed = false));
+  for (let i = 0; i < court.length; i++) {
+    if (court[i].isUsed) {
+      continue;
+    }
+    for (let j = 0; j < matches.length; j++) {
+      if (court[i].isValid) {
+        continue;
+      }
+      if (court[i].teren === matches[j].courtID && court[i].dan === matches[j].dayPlayed && court[i].sat === matches[j].hourPlayed) {
+        let check = true;
+        const player1 = igraci2.find((igrac) => igrac.PLAYER_ID === matches[j].player1ID);
+        const player2 = igraci2.find((igrac) => igrac.PLAYER_ID === matches[j].player2ID);
+        if (player1.ZELI_IGRATI_MECEVA < 1 || player2.ZELI_IGRATI_MECEVA < 1) {
+          continue;
+        }
+        for (let k = 0; k < usedCourts.length; k++) {
+          if (
+            (matches[j].player1ID === usedCourts[k].player1ID && matches[j].player2ID === usedCourts[k].player2ID) ||
+            (matches[j].player1ID === usedCourts[k].player1ID && matches[j].dayPlayed === usedCourts[k].dayPlayed) ||
+            (matches[j].player2ID === usedCourts[k].player2ID && matches[j].dayPlayed === usedCourts[k].dayPlayed) ||
+            (matches[j].player2ID === usedCourts[k].player1ID && matches[j].dayPlayed === usedCourts[k].dayPlayed) ||
+            (matches[j].player1ID === usedCourts[k].player2ID && matches[j].dayPlayed === usedCourts[k].dayPlayed)
+          ) {
+            check = false;
+          } else if (matches[j].courtID === usedCourts[k].courtID && matches[j].hourPlayed === usedCourts[k].hourPlayed) {
+            check = false;
+          }
+        }
+        if (check) {
+          player1.ZELI_IGRATI_MECEVA = player1.ZELI_IGRATI_MECEVA--;
+          player2.ZELI_IGRATI_MECEVA = player1.ZELI_IGRATI_MECEVA--;
+
+          matches[j].isValid = true;
+          usedCourts.push(matches[j]);
+          court[i].isUsed = true;
+        }
+      }
+    }
+  }
+  return { usedCourts, court };
 }
 
 async function setData(data) {
@@ -289,12 +391,14 @@ async function setData(data) {
   } else if (!data.PRIORITETI) {
     return "PRIORITETI in data is null";
   }
-  if (data.TIMEOUT && parseInt(data.TIMEOUT) > 1) {
+  if (data.TIMEOUT && parseInt(data.TIMEOUT) > 1 && parseInt(data.TIMEOUT) < 601) {
     timeLimit = parseInt(data.TIMEOUT) * 1000;
   } else {
-    timeLimit = 1000;
+    timeLimit = 5000;
   }
-
+  // timeLimit = 500000;
+  // console.log(timeLimit, parseInt(data.TIMEOUT));
+  //   console.log(data);
   //find max num of combinations
   let igraci2 = JSON.parse(JSON.stringify(data.IGRACI));
   let termini2 = JSON.parse(JSON.stringify(data.TERMINI_KLUBA));
@@ -324,122 +428,20 @@ async function setData(data) {
   courts = data.TERMINI_KLUBA;
   // console.log("data", data);
   let result;
-  for (let i = 0; i < data.IGRACI.length; i++) {
-    countNumberOfPlayers++;
-    result = await generateMatches(players, matches, currentMatch, courts);
-  }
+
+  result = await generateMatches(players, matches, currentMatch, courts);
   if (!result) {
     result = await matches;
   }
-//   console.log("result", result);
+  // console.log(maxCombination);
+  // console.log("result", result);
   let bestCombination = await prioritizeMatches(data, result);
-//   console.log("bestCombination", bestCombination);
+  // console.log("bestCombination", bestCombination);
   if (!bestCombination) {
     bestCombination = "no data";
   }
   return bestCombination;
 }
-
-// Funkcija za pronalaženje svih mogućih kombinacija mečeva
-function findAllPossibleMatches(players, clubSlots) {
-    const possibleMatches = [];
-  
-    // Generisanje svih mogućih parova igrača
-    const playerPairs = [];
-    for (let i = 0; i < players.length; i++) {
-      for (let j = i + 1; j < players.length; j++) {
-        const Igrac1 = players[i];
-        const Igrac2 = players[j];
-        for (let k = 0; k < Igrac1.TERMINI_IGRACA.length; k++) {
-          for (let l = 0; l < Igrac2.TERMINI_IGRACA.length; l++) {
-            if (Igrac1.TERMINI_IGRACA[k].sat === Igrac2.TERMINI_IGRACA[l].sat && Igrac1.TERMINI_IGRACA[k].dan === Igrac2.TERMINI_IGRACA[l].dan) {
-              for (let m = 0; m < Igrac1.POTENCIJALNI_PROTIVNICI.length; m++) {
-                for (let n = 0; n < Igrac2.POTENCIJALNI_PROTIVNICI.length; n++) {
-                  if (Igrac1.POTENCIJALNI_PROTIVNICI[m] === Igrac2.PLAYER_ID) {
-                    playerPairs.push([players[i], players[j]]);
-                    break;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  
-    // Pronalaženje termina za svaki par igrača
-    playerPairs.forEach(([player1, player2]) => {
-      clubSlots.forEach((slot) => {
-        const terminiIgrac1 = player1.TERMINI_IGRACA;
-        const terminiIgrac2 = player2.TERMINI_IGRACA;
-        for (let k = 0; k < terminiIgrac1.length; k++) {
-          for (let l = 0; l < terminiIgrac2.length; l++) {
-            if (terminiIgrac1[k].sat === terminiIgrac2[l].sat && terminiIgrac1[k].dan === terminiIgrac2[l].dan && slot.dan === terminiIgrac1[k].dan && slot.sat === terminiIgrac1[k].sat) {
-              possibleMatches.push({
-                player1ID: player1.PLAYER_ID,
-                player2ID: player2.PLAYER_ID,
-                dayPlayed: slot.dan,
-                hourPlayed: slot.sat,
-                courtID: slot.teren,
-                isValid: false,
-              });
-              break;
-            }
-          }
-        }
-      });
-    });
-    return possibleMatches;
-  }
-  // Funkcija za maksimizaciju broja mečeva
-  function maximizeMatches(matches, igraci2, termini2) {
-    // svaki igrac igra sa drugim protivnikom neki drugi dan u slobodnom terminu
-    const usedCourts = [];
-    const TERMINI_KLUBA = Array.from(termini2);
-    const court = TERMINI_KLUBA;
-    court.forEach((c) => (c.isUsed = false));
-    for (let i = 0; i < court.length; i++) {
-      if (court[i].isUsed) {
-        continue;
-      }
-      for (let j = 0; j < matches.length; j++) {
-        if (court[i].isValid) {
-          continue;
-        }
-        if (court[i].teren === matches[j].courtID && court[i].dan === matches[j].dayPlayed && court[i].sat === matches[j].hourPlayed) {
-          let check = true;
-          const player1 = igraci2.find((igrac) => igrac.PLAYER_ID === matches[j].player1ID);
-          const player2 = igraci2.find((igrac) => igrac.PLAYER_ID === matches[j].player2ID);
-          if (player1.ZELI_IGRATI_MECEVA < 1 || player2.ZELI_IGRATI_MECEVA < 1) {
-            continue;
-          }
-          for (let k = 0; k < usedCourts.length; k++) {
-            if (
-              (matches[j].player1ID === usedCourts[k].player1ID && matches[j].player2ID === usedCourts[k].player2ID) ||
-              (matches[j].player1ID === usedCourts[k].player1ID && matches[j].dayPlayed === usedCourts[k].dayPlayed) ||
-              (matches[j].player2ID === usedCourts[k].player2ID && matches[j].dayPlayed === usedCourts[k].dayPlayed) ||
-              (matches[j].player2ID === usedCourts[k].player1ID && matches[j].dayPlayed === usedCourts[k].dayPlayed) ||
-              (matches[j].player1ID === usedCourts[k].player2ID && matches[j].dayPlayed === usedCourts[k].dayPlayed)
-            ) {
-              check = false;
-            }
-            else if (matches[j].courtID === usedCourts[k].courtID && matches[j].hourPlayed === usedCourts[k].hourPlayed) {
-              check = false;
-            }
-          }
-          if (check) {
-            player1.ZELI_IGRATI_MECEVA = player1.ZELI_IGRATI_MECEVA--;
-            player2.ZELI_IGRATI_MECEVA = player1.ZELI_IGRATI_MECEVA--;
-  
-            matches[j].isValid = true;
-            usedCourts.push(matches[j]);
-            court[i].isUsed = true;
-          }
-        }
-      }
-    }
-    return { usedCourts, court };
-  }
 
 const dev = 1;
 
