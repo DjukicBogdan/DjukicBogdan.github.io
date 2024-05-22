@@ -144,6 +144,8 @@ function startScheduling(inputJson) {
   // Function to calculate the score for the criterion "Svaki igrač min 1 meč"
   function Score_SvakiIgracJedanMec(currentCombination, players, koef_MINJEDANMEC) {
     // Create a set to store distinct player IDs from the current combination of matches
+    if (players.length == 0) return 0;
+
     const distinctPlayers = new Set();
 
     // Iterate through each match in the current combination
@@ -183,6 +185,8 @@ function startScheduling(inputJson) {
 
   // Function to calculate the score for the criterion "Jutarnji termini"
   function Score_Jutarnji(currentCombination, countMorningSlotsInClub, koef_JUTARNJI) {
+    if (countMorningSlotsInClub == 0) return 0;
+
     // Count the morning timeslots found in the current combination (timeslot.sat < 12)
     const countMorningTimeSlotsFoundinCurrentCombination = currentCombination.filter((match) => parseInt(match.timeslot.sat) < 12).length;
 
@@ -197,6 +201,8 @@ function startScheduling(inputJson) {
 
   // Function to calculate the score for the criterion "Max broj mečeva"
   function Score_MaxMeceva(currentCombination, courtsOfferedByClub, koef_MAXMECEVA) {
+    if (courtsOfferedByClub == 0) return 0;
+
     // Calculate the score as the number of matches in the current combination divided by the total number of offered courts
     const score = (currentCombination.length / courtsOfferedByClub) * koef_MAXMECEVA;
 
@@ -206,6 +212,8 @@ function startScheduling(inputJson) {
 
   // Function to calculate the score for the criterion "Max preostalih mečeva"
   function Score_MaxPreostalihMeceva(currentCombination, players, totalPreostalihForAllPlayers, koef_MAXPREOSTALI) {
+    if (totalPreostalihForAllPlayers == 0) return 0;
+
     // Create a set to store distinct player IDs from the current combination of matches
     const distinctPlayers = new Set();
 
@@ -243,6 +251,8 @@ function startScheduling(inputJson) {
 
   // Function to calculate the score for the criterion "Prijavljenih termina"
   function Score_PrijavljenihTermina(currentCombination, players, totalPrijavlenihTerminaForAllPlayers, koef_MAXPRIJAVLJENIH) {
+    if (totalPrijavlenihTerminaForAllPlayers == 0) return 0;
+
     // Create a set to store distinct player IDs from the current combination of matches
     const distinctPlayers = new Set();
 
@@ -363,6 +373,7 @@ function startScheduling(inputJson) {
   // Start the backtracking process
   const startTime = Date.now(); // Record the start time
   const currentCombination = []; // Initialize the current combination
+
   backtrack(currentCombination, players, courtAvailabilities, allPossibleCombinations, combinationLengthCount, startTime, timeout);
 
   // Function to generate output JSON after backtracking
@@ -426,6 +437,7 @@ function startScheduling(inputJson) {
              []
         );
       }
+
   //       resultsDiv.innerHTML += `Best combination has ${bestCombination.length} matches.<br>`;
 
   //       // Display the best combination in a table
@@ -447,11 +459,11 @@ function startScheduling(inputJson) {
 
   //       // Generate and display the output JSON
   const outputJson = generateOutputJson(players, bestCombination, clubTimeslots);
-        // document.getElementById("outputJson").innerText = outputJson;
+  // document.getElementById("outputJson").innerText = outputJson;
 
-        // Generate and display the matches JSON
-        // const matchesJson = generateMatchesJson(bestCombination);
-        // document.getElementById("matchesJson").innerText = matchesJson;
+  // Generate and display the matches JSON
+  // const matchesJson = generateMatchesJson(bestCombination);
+  // document.getElementById("matchesJson").innerText = matchesJson;
   //  } else {
   //       resultsDiv.innerHTML += "No valid combinations found.<br>";
   //  } // End of if-else (best combination check)
@@ -470,7 +482,6 @@ function startScheduling(inputJson) {
     const obj = { pocetakAlgoritmaTimeStamp: startTime, krajAlgoritmaTimeStamp: Date.now() };
     bestCombinationOutput.push(obj);
     bestCombinationOutput.push(JSON.parse(outputJson));
-   
   }
 
   return bestCombinationOutput;
@@ -505,7 +516,7 @@ async function setData(data) {
   //     });
   //   });
   //   const obj = { pocetakAlgoritmaTimeStamp: startTime, krajAlgoritmaTimeStamp: Date.now() };
-    // bestCombinationOutput.push(obj);
+  // bestCombinationOutput.push(obj);
   // }
 
   if (!bestCombination) {
@@ -518,7 +529,7 @@ async function setData(data) {
 const dev = 1;
 
 if (dev === 0) {
-  fetch("./data8.json")
+  fetch("./data9.json")
     .then((response) => response.json())
     .then((json) => setData(json));
 }
