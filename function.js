@@ -419,12 +419,13 @@ function startScheduling(inputJson) {
   //  } // End of if-else (timeout check)
 
   // Find the combination with the most matches
-  //  if (allPossibleCombinations.length > 0) {
-  //       bestCombination = allPossibleCombinations.reduce(
-  //            (best, current) =>
-  //                 current.length > best.length ? current : best,
-  //            []
-  //       );
+   if (allPossibleCombinations.length > 0) {
+        bestCombination = allPossibleCombinations.reduce(
+             (best, current) =>
+                  current.length > best.length ? current : best,
+             []
+        );
+      }
   //       resultsDiv.innerHTML += `Best combination has ${bestCombination.length} matches.<br>`;
 
   //       // Display the best combination in a table
@@ -446,18 +447,37 @@ function startScheduling(inputJson) {
 
   //       // Generate and display the output JSON
   const outputJson = generateOutputJson(players, bestCombination, clubTimeslots);
-  //       document.getElementById("outputJson").innerText = outputJson;
+        // document.getElementById("outputJson").innerText = outputJson;
 
-  //       // Generate and display the matches JSON
-  //       const matchesJson = generateMatchesJson(bestCombination);
-  //       document.getElementById("matchesJson").innerText = matchesJson;
+        // Generate and display the matches JSON
+        // const matchesJson = generateMatchesJson(bestCombination);
+        // document.getElementById("matchesJson").innerText = matchesJson;
   //  } else {
   //       resultsDiv.innerHTML += "No valid combinations found.<br>";
   //  } // End of if-else (best combination check)
-  return allPossibleCombinations;
+
+  let bestCombinationOutput = [];
+  if (bestCombination) {
+    allPossibleCombinations[0].forEach((item) => {
+      bestCombinationOutput.push({
+        player1Id: item.player1,
+        player2Id: item.player2,
+        courtID: item.court,
+        dayPlayed: item.timeslot.dan,
+        hourPlayed: item.timeslot.sat,
+      });
+    });
+    const obj = { pocetakAlgoritmaTimeStamp: startTime, krajAlgoritmaTimeStamp: Date.now() };
+    bestCombinationOutput.push(obj);
+    bestCombinationOutput.push(JSON.parse(outputJson));
+   
+  }
+
+  return bestCombinationOutput;
 } // End of startScheduling function
 
 async function setData(data) {
+  const startTime = Date.now();
   if (!data) {
     return "data is null";
   } else if (!data || typeof data !== "object") {
@@ -470,32 +490,35 @@ async function setData(data) {
     return "PRIORITETI in data is null";
   }
   let bestCombination = await startScheduling(data);
-//   console.log("bestCombination", bestCombination);
+  //   console.log("bestCombination", bestCombination);
 
-  let bestCombinationOutput = [];
+  // let bestCombinationOutput = [];
 
-  if (bestCombination) {
-    bestCombination[0].forEach((item) => {
-      bestCombinationOutput.push({
-        player1Id: item.player1,
-        player2Id: item.player2,
-        courtID: item.court,
-        dayPlayed: item.timeslot.dan,
-        hourPlayed: item.timeslot.sat,
-      });
-    });
-  }
+  // if (bestCombination) {
+  //   bestCombination[0].forEach((item) => {
+  //     bestCombinationOutput.push({
+  //       player1Id: item.player1,
+  //       player2Id: item.player2,
+  //       courtID: item.court,
+  //       dayPlayed: item.timeslot.dan,
+  //       hourPlayed: item.timeslot.sat,
+  //     });
+  //   });
+  //   const obj = { pocetakAlgoritmaTimeStamp: startTime, krajAlgoritmaTimeStamp: Date.now() };
+    // bestCombinationOutput.push(obj);
+  // }
+
   if (!bestCombination) {
-    bestCombinationOutput = "no data";
+    bestCombination = "no data";
   }
-//   console.log("bestCombinationOutput", bestCombinationOutput);
-  return bestCombinationOutput;
+  console.log("bestCombination", bestCombination);
+  return bestCombination;
 }
 
 const dev = 1;
 
 if (dev === 0) {
-  fetch("./data7.json")
+  fetch("./data8.json")
     .then((response) => response.json())
     .then((json) => setData(json));
 }
@@ -518,4 +541,239 @@ if (dev === 1) {
     let senddata = await JSON.stringify(result);
     return await senddata.toString();
   };
+}
+
+const defaultJson = {
+  TIMEOUT: "60",
+  DOZVOLI_IGRACU_VISE_MECEVA_U_ISTOM_DANU: "true",
+  PRIORITETI: [
+    { id: "50", name: "Max prijavljenih termina", priority: "15.00" },
+    { id: "40", name: "Max preostalih mečeva", priority: "40.00" },
+    { id: "20", name: "Max broj mečeva", priority: "80.00" },
+    { id: "30", name: "Jutarnji termini", priority: "90.00" },
+    { id: "10", name: "Svaki igrač min 1 meč", priority: "100.00" },
+  ],
+  TERMINI_KLUBA: [
+    { dan: "1", sat: "8", teren: "vIMfQHxSaJFU8ogpAr0v" },
+    { dan: "1", sat: "8", teren: "Zk6uhkn9YXzh123c7Pra" },
+    { dan: "1", sat: "8", teren: "BG4G07LVpEvs5c9Bc3SI" },
+    { dan: "1", sat: "8", teren: "lWF4yvK8RwWtQ9OUZg2LXw" },
+  ],
+  IGRACI: [
+    {
+      PLAYER_ID: "a5d0HdEoSeKAewEGYjB1tw",
+      PLAYER_NAME: "Darko",
+      ZELI_IGRATI_MECEVA: "2",
+      PREOSTALO_MECEVA: "10",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "8" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+      ],
+    },
+    {
+      PLAYER_ID: "KUX3GnypTESueDzNkM-iig",
+      PLAYER_NAME: "Djurdje Milenkovic",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "14" },
+        { dan: "1", sat: "8" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "LDY-2YUXQj2feUUgE57xQw",
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+        "a5d0HdEoSeKAewEGYjB1tw",
+      ],
+    },
+    {
+      PLAYER_ID: "dnDEeNNPQNyEhCGpaAyBhQ",
+      PLAYER_NAME: "Goran Vukojičić ",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "14" },
+        { dan: "1", sat: "8" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "LDY-2YUXQj2feUUgE57xQw",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+        "a5d0HdEoSeKAewEGYjB1tw",
+      ],
+    },
+    {
+      PLAYER_ID: "JZpkbnTXQOKctUYhoLM4TQ",
+      PLAYER_NAME: "Luka Šojić",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "14" },
+        { dan: "1", sat: "8" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "LDY-2YUXQj2feUUgE57xQw",
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "a5d0HdEoSeKAewEGYjB1tw",
+      ],
+    },
+    {
+      PLAYER_ID: "a-y0ruSKNQguwK-4x5.VUyQ",
+      PLAYER_NAME: "Miloš Djurovic",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "14" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "LDY-2YUXQj2feUUgE57xQw",
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+        "a5d0HdEoSeKAewEGYjB1tw",
+      ],
+    },
+    {
+      PLAYER_ID: "NEpViJIiTcmloNcihgkANQ",
+      PLAYER_NAME: "Miloš Obrenović ",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "14" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "LDY-2YUXQj2feUUgE57xQw",
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+        "a5d0HdEoSeKAewEGYjB1tw",
+      ],
+    },
+    {
+      PLAYER_ID: "NvMXMjOdQ1S6yUzHdLDbUA",
+      PLAYER_NAME: "Nemanja Pisaric",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "14" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+        "a5d0HdEoSeKAewEGYjB1tw",
+        "LDY-2YUXQj2feUUgE57xQw",
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+      ],
+    },
+    {
+      PLAYER_ID: "LDY-2YUXQj2feUUgE57xQw",
+      PLAYER_NAME: "Nenad Roknic",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "10",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "8" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+      ],
+    },
+    {
+      PLAYER_ID: "Od9fmlcnSvWKXjhr9WrJpQ",
+      PLAYER_NAME: "Nikola Obradovic",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "8" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "tHGxFNjDQl2YkPd0ga2ZYQ",
+        "LDY-2YUXQj2feUUgE57xQw",
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+        "a5d0HdEoSeKAewEGYjB1tw",
+      ],
+    },
+    {
+      PLAYER_ID: "tHGxFNjDQl2YkPd0ga2ZYQ",
+      PLAYER_NAME: "Vladislav Groshkov",
+      ZELI_IGRATI_MECEVA: "1",
+      PREOSTALO_MECEVA: "11",
+      TERMINI_IGRACA: [
+        { dan: "1", sat: "8" },
+        { dan: "3", sat: "8" },
+      ],
+      POTENCIJALNI_PROTIVNICI: [
+        "LDY-2YUXQj2feUUgE57xQw",
+        "Od9fmlcnSvWKXjhr9WrJpQ",
+        "dnDEeNNPQNyEhCGpaAyBhQ",
+        "NEpViJIiTcmloNcihgkANQ",
+        "NvMXMjOdQ1S6yUzHdLDbUA",
+        "a-y0ruSKNQguwK-4x5.VUyQ",
+        "KUX3GnypTESueDzNkM-iig",
+        "JZpkbnTXQOKctUYhoLM4TQ",
+        "a5d0HdEoSeKAewEGYjB1tw",
+      ],
+    },
+  ],
+};
+
+if (dev === 2) {
+  setData(defaultJson);
 }
