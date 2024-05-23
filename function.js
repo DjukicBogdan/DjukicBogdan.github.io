@@ -430,13 +430,9 @@ function startScheduling(inputJson) {
   //  } // End of if-else (timeout check)
 
   // Find the combination with the most matches
-   if (allPossibleCombinations.length > 0) {
-        bestCombination = allPossibleCombinations.reduce(
-             (best, current) =>
-                  current.length > best.length ? current : best,
-             []
-        );
-      }
+  if (allPossibleCombinations.length > 0) {
+    bestCombination = allPossibleCombinations.reduce((best, current) => (current.length > best.length ? current : best), []);
+  }
 
   //       resultsDiv.innerHTML += `Best combination has ${bestCombination.length} matches.<br>`;
 
@@ -489,7 +485,9 @@ function startScheduling(inputJson) {
 
 async function setData(data) {
   const startTime = Date.now();
-  if (!data) {
+  if (data == "") {
+    return "" + startTime;
+  } else if (!data) {
     return "data is null";
   } else if (!data || typeof data !== "object") {
     return "Invalid JSON data format: Data is not a valid JSON object.";
@@ -536,6 +534,9 @@ if (dev === 0) {
 
 if (dev === 1) {
   window.function = async function (text) {
+    if (text.value == "") {
+      return "" + Date.now().toString();
+    }
     let json = JSON.parse(text.value);
 
     // Provera da li je JSON objekat validan
