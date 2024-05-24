@@ -553,7 +553,7 @@ async function setData(data) {
   return bestCombination;
 }
 
-const dev = 0;
+const dev = 1;
 
 if (dev === 0) {
   fetch("./data9.json")
