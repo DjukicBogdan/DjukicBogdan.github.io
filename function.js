@@ -280,22 +280,21 @@ function startScheduling(inputJson) {
   //dan, pa posle dva dana ponovo pokusa da doda mec. Zato u input jsonu prosledjujemo "RASPORED_TRENUTNO_KOLO":[{ "dan" : "6" , "sat" : "16" }, { "dan" : "7" , "sat" : "20" }, { "dan" : "5" , "sat" : "20" }]
   function IgracVecPrethodnoImaMecURasporeduNaTajDan(playerID, players, day) {
     // Find the player object with the specified playerID
-    const player = players.find(p => p.PLAYER_ID === playerID);
+    const player = players.find((p) => p.PLAYER_ID === playerID);
 
     // If the player is not found, return false
     if (!player) {
-        return false;
+      return false;
     }
 
     // Check if the player has matches scheduled in the current round
     if (!player.RASPORED_TRENUTNO_KOLO) {
-        return false;
+      return false;
     }
 
     // Return true if the player has a match scheduled on the specified day, otherwise false
-    return player.RASPORED_TRENUTNO_KOLO.some(schedule => schedule.dan === day);
-} //end of IgracVecPrethodnoImaMecURasporeduNaTajDan
-
+    return player.RASPORED_TRENUTNO_KOLO.some((schedule) => schedule.dan === day);
+  } //end of IgracVecPrethodnoImaMecURasporeduNaTajDan
 
   // Backtracking function to explore all possible match combinations
   function backtrack(currentCombination, players, courtAvailabilities, allPossibleCombinations, combinationLengthCount, startTime, timeout) {
@@ -356,8 +355,8 @@ function startScheduling(inputJson) {
           for (const timeslotKey in courtAvailabilities) {
             const [day, hour] = timeslotKey.split("-");
             const timeslot = { dan: day, sat: hour };
-            const jedanOdIgracaVecPrethodnoImaMecURasporeduNaTajDan = IgracVecPrethodnoImaMecURasporeduNaTajDan(player1.PLAYER_ID,players,timeslot.dan) ||
-                                                                      IgracVecPrethodnoImaMecURasporeduNaTajDan(player2.PLAYER_ID,players,timeslot.dan);
+            const jedanOdIgracaVecPrethodnoImaMecURasporeduNaTajDan =
+              IgracVecPrethodnoImaMecURasporeduNaTajDan(player1.PLAYER_ID, players, timeslot.dan) || IgracVecPrethodnoImaMecURasporeduNaTajDan(player2.PLAYER_ID, players, timeslot.dan);
 
             // Check if the time slot is preferred by both players and if they can play multiple matches in the same day
             if (
@@ -521,6 +520,12 @@ async function setData(data) {
     return "TERMINI_KLUBA in data is null";
   } else if (!data.PRIORITETI) {
     return "PRIORITETI in data is null";
+  } else if (data.IGRACI.length < 2) {
+    return "Invalid JSON data format: Missing player information.";
+  } else if (data.TERMINI_KLUBA.length === 0) {
+    return "Invalid JSON data format: Missing club slots information.";
+  } else if (data.PRIORITETI.length === 0) {
+    return "Invalid JSON data format: Missing priorities information.";
   }
   let bestCombination = await startScheduling(data);
   //   console.log("bestCombination", bestCombination);
@@ -548,12 +553,12 @@ async function setData(data) {
   return bestCombination;
 }
 
-const dev = 1;
+const dev = 0;
 
 if (dev === 0) {
   fetch("./data9.json")
     .then((response) => response.json())
-    .then((json) => setData(json));
+    .then(async(json) => console.log(await setData(json)));
 }
 
 if (dev === 1) {
@@ -571,6 +576,16 @@ if (dev === 1) {
     // Provera ostalih neophodnih delova JSON-a
     if (!json.IGRACI || !Array.isArray(json.IGRACI) || !json.TERMINI_KLUBA || !Array.isArray(json.TERMINI_KLUBA) || !json.PRIORITETI || !Array.isArray(json.PRIORITETI)) {
       return "Invalid JSON data format: Missing player information, club slots, or priorities.";
+    }
+
+    if (json.IGRACI.length === 0) {
+      return "Invalid JSON data format: Missing player information.";
+    }
+    if (json.TERMINI_KLUBA.length === 0) {
+      return "Invalid JSON data format: Missing club slots information.";
+    }
+    if (json.PRIORITETI.length === 0) {
+      return "Invalid JSON data format: Missing priorities information.";
     }
 
     let result = await setData(json);
