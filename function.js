@@ -357,7 +357,7 @@ function startScheduling(inputJson) {
             const [day, hour] = timeslotKey.split("-");
             const timeslot = { dan: day, sat: hour };
             const jedanOdIgracaVecPrethodnoImaMecURasporeduNaTajDan = IgracVecPrethodnoImaMecURasporeduNaTajDan(player1.PLAYER_ID,players,timeslot.dan) ||
-                                                                      IgracVecPrethodnoImaMecURasporeduNaTajDan(player2.PLAYER_ID,players,timeslot.dan);
+                                                                      IgracVecPrethodnoImaMecURasporeduNaTajDan(player2.PLAYER_ID,timeslot.dan);
 
 
             // Check if the time slot is preferred by both players and if they can play multiple matches in the same day
@@ -366,7 +366,7 @@ function startScheduling(inputJson) {
               canPlayInTimeslot(player2, timeslot) &&
               !hasMatchAtSameTime(player1, player2, timeslot, currentCombination) &&
               (allowMultipleMatchesPerDay || !hasMatchOnSameDay(player1, player2, timeslot, currentCombination)) &&
-              (allowMultipleMatchesPerDay || !jedanOdIgracaVecPrethodnoImaMecURasporeduNaTajDan)) 
+              (allowMultipleMatchesPerDay || !jedanOdIgracaVecPrethodnoImaMecURasporeduNaTajDan)
             ) {
               // Allocate a court for the match
               const availableCourts = courtAvailabilities[timeslotKey];
