@@ -276,6 +276,27 @@ function startScheduling(inputJson) {
     return score;
   }
 
+  //funkcija proverava da li je u prosledjenom jsonu igrac vec ima zakazan mec na taj dan. Ovo je u slucaju da administrator koristi algoritam vise puta tokom nedelje i u prvom pozivanju doda mec u rasporedu na taj
+  //dan, pa posle dva dana ponovo pokusa da doda mec. Zato u input jsonu prosledjujemo "RASPORED_TRENUTNO_KOLO":[{ "dan" : "6" , "sat" : "16" }, { "dan" : "7" , "sat" : "20" }, { "dan" : "5" , "sat" : "20" }]
+  function IgracVecPrethodnoImaMecURasporeduNaTajDan(playerID, players, day) {
+    // Find the player object with the specified playerID
+    const player = players.find(p => p.PLAYER_ID === playerID);
+
+    // If the player is not found, return false
+    if (!player) {
+        return false;
+    }
+
+    // Check if the player has matches scheduled in the current round
+    if (!player.RASPORED_TRENUTNO_KOLO) {
+        return false;
+    }
+
+    // Return true if the player has a match scheduled on the specified day, otherwise false
+    return player.RASPORED_TRENUTNO_KOLO.some(schedule => schedule.dan === day);
+} //end of IgracVecPrethodnoImaMecURasporeduNaTajDan
+
+
   // Backtracking function to explore all possible match combinations
   function backtrack(currentCombination, players, courtAvailabilities, allPossibleCombinations, combinationLengthCount, startTime, timeout) {
     // Update the timeout display
@@ -335,13 +356,17 @@ function startScheduling(inputJson) {
           for (const timeslotKey in courtAvailabilities) {
             const [day, hour] = timeslotKey.split("-");
             const timeslot = { dan: day, sat: hour };
+            const jedanOdIgracaVecPrethodnoImaMecURasporeduNaTajDan = IgracVecPrethodnoImaMecURasporeduNaTajDan(player1,players,timeslot.dan) ||
+                                                                      IgracVecPrethodnoImaMecURasporeduNaTajDan(player2,players,timeslot.dan);
+
 
             // Check if the time slot is preferred by both players and if they can play multiple matches in the same day
             if (
               canPlayInTimeslot(player1, timeslot) &&
               canPlayInTimeslot(player2, timeslot) &&
               !hasMatchAtSameTime(player1, player2, timeslot, currentCombination) &&
-              (allowMultipleMatchesPerDay || !hasMatchOnSameDay(player1, player2, timeslot, currentCombination))
+              (allowMultipleMatchesPerDay || !hasMatchOnSameDay(player1, player2, timeslot, currentCombination)) &&
+              (allowMultipleMatchesPerDay || !jedanOdIgracaVecPrethodnoImaMecURasporeduNaTajDan)) 
             ) {
               // Allocate a court for the match
               const availableCourts = courtAvailabilities[timeslotKey];
