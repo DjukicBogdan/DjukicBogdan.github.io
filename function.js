@@ -28,7 +28,7 @@ function startScheduling(inputJson) {
   }, {}); // End of reduce
 
   const countClubMorningTimeslotsTotalInInputJson = Object.keys(courtAvailabilities)
-    .filter((timeslotKey) => parseInt(timeslotKey.split("-")[1]) < 12)
+    .filter((timeslotKey) => parseInt(timeslotKey.split("-")[1]) < 15)
     .reduce((acc, key) => acc + courtAvailabilities[key].length, 0);
 
   const totalPreostalihForAllPlayers = CalculateTotalPreostalihForAllPlayers(inputJson);
@@ -187,10 +187,10 @@ function startScheduling(inputJson) {
   function Score_Jutarnji(currentCombination, countMorningSlotsInClub, koef_JUTARNJI) {
     if (countMorningSlotsInClub == 0) return 0;
 
-    // Count the morning timeslots found in the current combination (timeslot.sat < 12)
-    const countMorningTimeSlotsFoundinCurrentCombination = currentCombination.filter((match) => parseInt(match.timeslot.sat) < 12).length;
+    // Count the morning timeslots found in the current combination (timeslot.sat < 15)
+    const countMorningTimeSlotsFoundinCurrentCombination = currentCombination.filter((match) => parseInt(match.timeslot.sat) < 15).length;
 
-    // Count the total number of morning timeslots offered by the club (timeslot.sat < 12)
+    // Count the total number of morning timeslots offered by the club (timeslot.sat < 15)
 
     // Calculate the score using the provided formula
     const score = (countMorningTimeSlotsFoundinCurrentCombination / countMorningSlotsInClub) * koef_JUTARNJI;
